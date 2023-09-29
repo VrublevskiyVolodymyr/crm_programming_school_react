@@ -1,0 +1,80 @@
+* {
+    box-sizing: border-box;
+}
+
+
+.pagination {
+    display: flex;
+    list-style: none;
+    height: 50px;
+    padding: 0;
+   margin-bottom: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination li {
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.pagination a {
+    display: inline-block;
+    background-color: green;
+    color: white;
+    border: 1px solid transparent;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+
+.pagination .circle {
+    width: 40px;
+    height: 40px;
+    background-color: green;
+    color: white;
+    border: 1px solid transparent;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.pagination .active a,
+.pagination li:hover a,
+.pagination li:first-child a,
+.pagination li:last-child a {
+    background-color: #ffffff;
+    color: green;
+    font-weight: bold;
+}
+
+.pagination .circle:hover,
+.pagination .active .circle {
+    background-color: white;
+    color: green;
+    font-weight: bold;
+}
+
+/*.pagination li.next.disabled a {*/
+/*    display: none;*/
+/*    color: white;*/
+/*}*/
+
+/*.pagination .circle.hidden {*/
+/*    display: none;*/
+/*    color: white;*/
+/*}*/
+
+/*.pagination .active .circle.hidden,*/
+/*.pagination .circle:hover.hidden {*/
+/*    display: inline-block;*/
+/*    color: white;*/
+/*}*/

@@ -1,0 +1,10 @@
+* {
+    box-sizing: border-box;
+}
+.footer {
+    min-height: 50px;
+    background-color: #5fc664;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

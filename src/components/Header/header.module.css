@@ -1,0 +1,35 @@
+* {
+    box-sizing: border-box;
+}
+.header {
+    min-height: 50px;
+    background-color: #5fc664;
+    font-size: 25px;
+    color: snow;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header a{
+    text-decoration: none;
+    color: snow;
+    padding:0 10px ;
+}
+.header a[class='active']{
+    color: red;
+}
+
+.logout {
+    background-color: #367c39;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0 10px ;
+}
+
+.logout:hover {
+    background-color: #a0ef44;
+}
