@@ -3,7 +3,7 @@ import {Navigate, Route, Routes} from "react-router-dom";
 
 import {MainLayout} from "./layouts";
 import {LoginPage, OrderPage} from "./pages";
-import {RequiredAuth} from "./hok";
+import {RequiredAuth} from "./hoс";
 import './App.css';
 
 

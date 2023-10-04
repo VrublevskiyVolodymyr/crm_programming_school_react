@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 import { IOrder } from "../../interfaces";
 import { useAppDispatch, useAppSelector } from "../../hooks";
@@ -10,19 +10,22 @@ interface IProps {
     orders: IOrder[];
 }
 
-const Order: FC<IProps> = ({ orders }) => {
+const Order: FC<IProps> = ({ orders}) => {
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
     const { sortedColumn, sortDirection } = useAppSelector((state) => state.orderReducer);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+
+
     const onHeaderClick = (columnKey: string) => {
         const newSortDirection =
             sortedColumn === columnKey && sortDirection === "asc" ? "desc" : "asc";
         const sortOrder = newSortDirection === "asc" ? "" : "-";
         const orderBy = `${sortOrder}${columnKey}`;
 
-        dispatch(orderActions.setSortedColumn({ columnKey, newSortDirection }));
-        navigate(`/orders/?page=1&order=${orderBy}`);
+        dispatch(orderActions.setSortedColumn({columnKey, newSortDirection}));
+
+        navigate(`/orders?page=1&order=${orderBy}`);
     };
 
     const toggleRow = (rowId: number) => {

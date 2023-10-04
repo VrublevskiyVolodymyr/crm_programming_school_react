@@ -1,11 +1,13 @@
 import {createAsyncThunk, createSlice, isFulfilled, isRejectedWithValue} from '@reduxjs/toolkit';
 import {AxiosError} from 'axios';
 
-import {ITokenPair, IError, IUser} from '../../interfaces';
+import {ITokenPair, IError, IUser, IErrorAuth} from '../../interfaces';
 import {authService} from '../../services';
 
+
+
 interface IState {
-    error: IError | null;
+    error: IErrorAuth | null ;
     me: IUser | null;
 }
 
@@ -20,9 +22,9 @@ const login = createAsyncThunk<IUser, ITokenPair>(
         try {
             return await authService.login(user);
         } catch (e) {
-            const err = e as AxiosError
-            if (err.response) {
-                return rejectWithValue(err.response.data);
+            const error = e as AxiosError
+            if (error.response) {
+                return rejectWithValue(error.response.data);
             } else {
                 return rejectWithValue({message: 'An error occurred'} );
             }
@@ -45,7 +47,6 @@ const slice = createSlice({
             state.me = null;
             state.error = null;
         },
-
     },
     extraReducers: builder =>
         builder
@@ -59,7 +60,7 @@ const slice = createSlice({
                 state.error = null
             })
             .addMatcher(isRejectedWithValue(), (state, action) => {
-                state.error = action.payload as IError
+                state.error = action.payload as IErrorAuth
             })
 });
 
@@ -68,10 +69,10 @@ const {actions, reducer: authReducer} = slice;
 const authActions = {
     ...actions,
     login,
-    me
+    me,
 }
 
 export {
     authReducer,
-    authActions
+    authActions,
 }

@@ -17,7 +17,7 @@ label {
     font-weight: bold;
 }
 
-input[type="text"],
+input[type="email"],
 input[type="password"] {
     width: 100%;
     padding: 10px;
@@ -38,3 +38,4 @@ input[type="password"] {
 .loginButton:hover {
     background-color: #0056b3;
 }
+

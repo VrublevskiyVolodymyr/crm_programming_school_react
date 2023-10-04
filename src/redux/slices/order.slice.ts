@@ -11,7 +11,7 @@ interface IState {
     next: string | null,
     total_pages: number | null,
     sortDirection: string,
-    sortedColumn: string
+    sortedColumn: string,
 }
 
 const initialState: IState = {
@@ -21,7 +21,7 @@ const initialState: IState = {
     next: null,
     total_pages: null,
     sortDirection: "asc",
-    sortedColumn: "-id"
+    sortedColumn: "",
 };
 
 const getAll = createAsyncThunk<IOrderPainted, { page: number, order: string }>(
@@ -42,10 +42,9 @@ const orderSlice = createSlice({
     initialState,
     reducers: {
         setSortedColumn: (state, action) => {
-            const {columnKey, newSortDirection} = action.payload;
-            state.sortedColumn = columnKey;
-            state.sortDirection = newSortDirection;
-        }
+            state.sortedColumn = action.payload.columnKey;
+            state.sortDirection = action.payload.newSortDirection;
+        },
     },
     extraReducers: (builder) =>
         builder.addCase(getAll.fulfilled, (state, action) => {
@@ -56,6 +55,7 @@ const orderSlice = createSlice({
             state.total_pages = total_pages;
         }),
 });
+
 
 
 const {reducer: orderReducer, actions: {setSortedColumn}} = orderSlice;

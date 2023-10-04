@@ -27,7 +27,7 @@ axiosService.interceptors.response.use(
     },
     async (error: AxiosError) => {
         const originalRequest = error.config;
-        if (error.response?.status === 401||403) {
+        if (error.response?.status === 401) {
             if (!isRefreshing) {
                 isRefreshing = true;
                 try {

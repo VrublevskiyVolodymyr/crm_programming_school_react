@@ -9,25 +9,22 @@ import {Pagination} from "../Pagination/Pagination";
 interface IProps {}
 
 const Orders: FC<IProps> = () => {
-    const { orders, sortDirection, sortedColumn, total_pages } = useAppSelector((state) => state.orderReducer);
+    const { orders, total_pages } = useAppSelector((state) => state.orderReducer);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     const [query, setQuery] = useSearchParams({page: '1'});
-
     const currentPage = query.get('page') ? parseInt(query.get('page') as string, 10) : 1;
-
-
-    useEffect(() => {
-        console.log("orderActions.getAll")
-        const sortOrder = sortDirection === "asc" ? "" : "-";
-        const orderBy = `${sortOrder}${sortedColumn}`;
-        dispatch(orderActions.getAll({ page: currentPage, order: orderBy }));
-    }, [currentPage, sortedColumn, sortDirection, dispatch]);
+    const orderBy = query.get('order')||"";
 
     const handlePageChange = (selectedPage: number) => {
-        navigate(`/orders/?page=${selectedPage}`);
+        orderBy? navigate(`/orders?page=${selectedPage}&order=${orderBy}`) : navigate(`/orders?page=${selectedPage}`);
     };
+
+    useEffect(() => {
+        dispatch(orderActions.getAll({ page: currentPage, order: orderBy }));
+    }, [currentPage, orderBy, dispatch]);
+
 
     return (
         <div>

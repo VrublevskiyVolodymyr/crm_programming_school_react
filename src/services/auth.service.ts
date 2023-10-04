@@ -2,13 +2,14 @@ import { AxiosResponse } from 'axios';
 
 import { IRes } from '../types';
 import { urls } from "../configs";
-import { ITokenPair, ITokens, IUser } from "../interfaces";
+import {ITokenPair, ITokens, IUser} from "../interfaces";
 import { axiosService } from "./axios.service";
 import {AuthService} from "../types/authService.type";
 
 
 
 const authService: AuthService = {
+
 
     login: async (cred: ITokenPair): Promise<IUser> => {
         try {
@@ -17,7 +18,7 @@ const authService: AuthService = {
             const { data: user }: AxiosResponse<IUser> = await authService.me();
             return user;
         } catch (error) {
-            throw new Error('Login failed');
+            throw error;
         }
     },
 

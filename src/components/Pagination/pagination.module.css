@@ -47,7 +47,7 @@
     transition: background-color 0.2s, color 0.2s;
 }
 
-.pagination .active a,
+
 .pagination li:hover a,
 .pagination li:first-child a,
 .pagination li:last-child a {
@@ -62,19 +62,8 @@
     color: green;
     font-weight: bold;
 }
+.pagination .active a{
+    background-color: #a0ef44;
+    color: #073b09;
+}
 
-/*.pagination li.next.disabled a {*/
-/*    display: none;*/
-/*    color: white;*/
-/*}*/
-
-/*.pagination .circle.hidden {*/
-/*    display: none;*/
-/*    color: white;*/
-/*}*/
-
-/*.pagination .active .circle.hidden,*/
-/*.pagination .circle:hover.hidden {*/
-/*    display: inline-block;*/
-/*    color: white;*/
-/*}*/

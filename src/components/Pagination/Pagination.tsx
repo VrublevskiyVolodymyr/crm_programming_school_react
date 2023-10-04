@@ -11,15 +11,11 @@ interface IProps {
     isLastPage: boolean;
 }
 
-const Pagination: FC<IProps> = ({ pageCount, currentPage, onPageChange }) => {
-
+const Pagination: FC<IProps> = ({ pageCount, currentPage, onPageChange, isFirstPage,isLastPage }) => {
 
     const handlePageClick = (data: { selected: number }) => {
         onPageChange(data.selected + 1);
     };
-    const isFirstPage = currentPage === 1;
-    const isLastPage = currentPage === pageCount;
-
 
     const previousLabel = isFirstPage ? null : (
         <div className={css.circle}>&lt;</div>
@@ -28,16 +24,15 @@ const Pagination: FC<IProps> = ({ pageCount, currentPage, onPageChange }) => {
         <div className={css.circle}>&gt;</div>
     );
 
-
-
     return (
         <div className={css.pagination}>
             <ReactPaginate
+                key={currentPage}
                 pageCount={pageCount}
                 pageRangeDisplayed={5}
                 marginPagesDisplayed={1}
                 onPageChange={handlePageClick}
-                initialPage={currentPage - 1}
+                initialPage={currentPage-1}
                 className={'pagination'}
                 activeClassName={css.active}
                 previousLabel={previousLabel}
