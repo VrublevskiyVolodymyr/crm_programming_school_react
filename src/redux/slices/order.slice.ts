@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {AxiosError} from "axios";
 
-import {IOrder, IOrderPainted} from "../../interfaces";
+import {IComment, IOrder, IOrderPainted} from "../../interfaces";
 import {orderService} from "../../services";
 
 interface IState {
@@ -11,7 +11,7 @@ interface IState {
     next: string | null,
     total_pages: number | null,
     sortDirection: string,
-    sortedColumn: string,
+    sortedColumn: string
 }
 
 const initialState: IState = {
@@ -21,7 +21,7 @@ const initialState: IState = {
     next: null,
     total_pages: null,
     sortDirection: "asc",
-    sortedColumn: "",
+    sortedColumn: ""
 };
 
 const getAll = createAsyncThunk<IOrderPainted, { page: number, order: string }>(
@@ -37,6 +37,19 @@ const getAll = createAsyncThunk<IOrderPainted, { page: number, order: string }>(
     }
 );
 
+const createComment = createAsyncThunk<IComment, { comment: string , orderId: number}>(
+    'carSlice/create',
+    async ({comment,orderId}, {rejectWithValue}) => {
+        try {
+            const {data} =  await orderService.createComment(comment,orderId)
+            return data
+        } catch (e) {
+            const err = e as AxiosError
+            return rejectWithValue(err.response?.data)
+        }
+    }
+)
+
 const orderSlice = createSlice({
     name: "carSlice",
     initialState,
@@ -47,13 +60,23 @@ const orderSlice = createSlice({
         },
     },
     extraReducers: (builder) =>
-        builder.addCase(getAll.fulfilled, (state, action) => {
+        builder
+            .addCase(getAll.fulfilled, (state, action) => {
             const {items, prev, next, total_pages} = action.payload;
             state.orders = items;
             state.next = next;
             state.prev = prev;
             state.total_pages = total_pages;
-        }),
+        })
+
+            .addCase(createComment.fulfilled, (state, action) => {
+                const { orderId } = action.payload;
+                state.orders = state.orders.map((order) =>
+                    order.id === orderId
+                        ? { ...order, comments: [...order.comments, action.payload] }
+                        : order
+                );
+            }),
 });
 
 
@@ -62,6 +85,7 @@ const {reducer: orderReducer, actions: {setSortedColumn}} = orderSlice;
 
 const orderActions = {
     getAll,
+    createComment,
     setSortedColumn
 }
 

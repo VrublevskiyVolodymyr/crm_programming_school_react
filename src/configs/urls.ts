@@ -1,3 +1,5 @@
+import {IComment} from "../interfaces";
+
 const baseURL = "http://localhost:8080/api/v1"
 
 const admin = "/admin"
@@ -20,7 +22,8 @@ const urls = {
         groups: groups,
     },
     orders: {
-        orders: orders
+        orders: orders,
+        сomments:(orderId:number):string => `orders/${orderId}/comments`,
     },
     me:`${users}/me`
 

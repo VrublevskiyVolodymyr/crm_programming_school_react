@@ -1,0 +1,18 @@
+.commentForm {
+    display: flex;
+    align-items: flex-start;
+}
+
+.formGroup {
+    flex: 1;
+    margin-right: 10px;
+}
+
+
+.submitButton {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}

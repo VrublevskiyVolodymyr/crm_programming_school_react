@@ -19,6 +19,6 @@ export interface IOrder {
     manager: IUser;
     created: string;
     utm: string;
-    comments: IComment;
+    comments: IComment[];
     group: IGroup;
 }
