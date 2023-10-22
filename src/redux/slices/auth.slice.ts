@@ -3,6 +3,8 @@ import {AxiosError} from 'axios';
 
 import {ITokenPair, IError, IUser, IErrorAuth} from '../../interfaces';
 import {authService} from '../../services';
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
 
 
 
@@ -59,9 +61,14 @@ const slice = createSlice({
             .addMatcher(isFulfilled(), state => {
                 state.error = null
             })
-            .addMatcher(isRejectedWithValue(), (state, action) => {
-                state.error = action.payload as IErrorAuth
+            .addMatcher(isRejectedWithValue(login, me), (state, action) => {
+                if (typeof action.payload === 'string') {
+                    state.error = { error: action.payload, code: 401, details: null };
+                } else {
+                    state.error = action.payload as IErrorAuth;
+                }
             })
+
 });
 
 const {actions, reducer: authReducer} = slice;

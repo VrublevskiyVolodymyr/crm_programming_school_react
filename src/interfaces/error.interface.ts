@@ -4,5 +4,6 @@ export interface IError {
 
 export interface IErrorAuth extends IError {
     error: string;
-    code: number
+    code: number;
+    details: string | null;
 }

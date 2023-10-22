@@ -15,7 +15,7 @@ const Orders: FC<IProps> = () => {
 
     const [query, setQuery] = useSearchParams({page: '1'});
     const currentPage = query.get('page') ? parseInt(query.get('page') as string, 10) : 1;
-    const orderBy = query.get('order')||"";
+    const orderBy = query.get('order')||"-id";
 
     const handlePageChange = (selectedPage: number) => {
         orderBy? navigate(`/orders?page=${selectedPage}&order=${orderBy}`) : navigate(`/orders?page=${selectedPage}`);

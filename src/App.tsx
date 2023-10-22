@@ -19,7 +19,7 @@ const App: FC<IProps> = () => {
 
             <Routes>
                 <Route path={'/'} element={<MainLayout/>}>
-                    <Route index element={<Navigate to={"login"}/>}/>
+                    <Route index element={<Navigate to={"orders"}/>}/>
                     <Route path={"login"} element={<LoginPage />}/>
                     <Route path={'orders'} element={
                         <RequiredAuth>

@@ -130,7 +130,7 @@ const Order: FC<IProps> = ({orders}) => {
                                             </div>}
 
                                             <div className={css.commentForm}>
-                                                <CommentForm orderId={order.id} managerId={order.manager.id}/>
+                                                <CommentForm orderId={order.id} managerId={order.manager ? order.manager.id : 0} manager={order.manager}/>
                                             </div>
                                             {openModalIndex[order.id] !== undefined &&(
                                                 <CommentModal

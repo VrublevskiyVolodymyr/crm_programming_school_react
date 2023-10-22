@@ -1,6 +1,7 @@
 import {IGroup} from "./group.interface";
 import {IComment} from "./comment.interface";
 import {IUser} from "./user.interface";
+import {IManager} from "./manager.interface";
 
 export interface IOrder {
     id: number;
@@ -15,8 +16,8 @@ export interface IOrder {
     alreadyPaid: number;
     sum: number;
     msg: string;
-    status: boolean;
-    manager: IUser;
+    status: string;
+    manager: IManager;
     created: string;
     utm: string;
     comments: IComment[];

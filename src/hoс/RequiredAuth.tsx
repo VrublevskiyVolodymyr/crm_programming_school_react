@@ -11,7 +11,6 @@ const RequiredAuth: FC<IProps> = ({children}) => {
     const accessToken = authService.getAccessToken();
 
     if (!accessToken) {
-        console.log("<Navigate to={'/login'}")
         return <Navigate to={'/login'}/>
     }
 

@@ -5,16 +5,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {useAppDispatch, useAppSelector} from "../../hooks";
 import { orderActions } from "../../redux";
 import css from "./comment.module.css";
-import {authActions} from "../../redux/slices/auth.slice";
+import {IManager} from "../../interfaces";
 
 
 
 interface IProps {
     orderId: number;
     managerId:number;
+    manager:IManager | null;
 }
 
-const CommentForm: FC<IProps> = ({ orderId,managerId}) => {
+const CommentForm: FC<IProps> = ({ orderId,managerId, manager}) => {
     const dispatch = useAppDispatch();
    const {me} = useAppSelector(state => state.authReducer)
 
@@ -23,12 +24,10 @@ const CommentForm: FC<IProps> = ({ orderId,managerId}) => {
     });
 
     const createComment: SubmitHandler<{ comment: string }> = async (data) => {
-        if(me && me.id == managerId) {
             await dispatch(orderActions.createComment({
                 comment: data.comment, orderId
             }) as any);
             reset()
-        }
     };
 
     return (
@@ -37,7 +36,7 @@ const CommentForm: FC<IProps> = ({ orderId,managerId}) => {
                 <input className={"form-control"} type="text" placeholder="comment" {...register("comment", { required: true })} />
                 {errors.comment && <span>This field is required</span>}
             </div>
-            <button disabled={!isValid || !(me && me.id == managerId)} type="submit" className="btn btn-success">SUBMIT</button>
+            <button disabled={!isValid || !(me && me.id  && (manager===null || me.id === managerId))} type="submit" className="btn btn-success">SUBMIT</button>
         </form>
     );
 };

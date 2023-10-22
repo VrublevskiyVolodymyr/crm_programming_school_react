@@ -6,8 +6,6 @@ import {ITokenPair} from "../../interfaces";
 import {authActions} from "../../redux/slices/auth.slice";
 import {authService} from "../../services";
 import css from './login.module.css'
-import {joiResolver} from "@hookform/resolvers/joi";
-import {authValidator} from "../../validators";
 import {useState} from "react";
 
 const LoginForm = () => {
@@ -15,16 +13,12 @@ const LoginForm = () => {
     const {error} = useAppSelector(state => state.authReducer);
 
     const navigate = useNavigate();
-    const {handleSubmit, register, formState: {errors}} = useForm<ITokenPair>({
-        mode: 'onSubmit',
-        resolver: joiResolver(authValidator)
-    });
+    const {handleSubmit, register, formState: {}} = useForm<ITokenPair>({});
 
     const [showError, setShowError] = useState(false);
 
 
     const login: SubmitHandler<ITokenPair> = async (user) => {
-
         try {
             const { meta: { requestStatus } } = await dispatch(authActions.login(user));
 
@@ -47,19 +41,19 @@ const LoginForm = () => {
         setShowError(true);
     }
 
+
     return (
         <form onSubmit={handleSubmit(login)} className={css.loginForm}>
             <div className={css.formGroup}>
                 <label>Email</label>
-            <input className={"form-control"} type="email" placeholder={'username'} {...register('username', {required: true})}   onChange={handleInputChange}/>
+            <input className={"form-control"} type="email" placeholder={'username'} {...register('username', {required: true})} onChange={handleInputChange} />
             </div>
             <div className={css.formGroup}>
                 <label>Password</label>
-            <input className={"form-control"} type="password" placeholder={'password'} {...register('password', {required: true})}   onChange={handleInputChange}/>
+            <input className={"form-control"} type="password" placeholder={'password'} {...register('password', {required: true})} onChange={handleInputChange} />
             </div>
-            {error && <p>{error.error}</p>}
             <button className="btn btn-success" onClick={handleButtonSubmit}>Login</button>
-            {showError && Object.keys(errors).length > 0 && <div>{Object.values(errors)[0].message}</div>}
+            {showError && error && <p>{error.error}</p>}
         </form>
     );
 }

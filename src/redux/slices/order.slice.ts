@@ -6,7 +6,6 @@ import {orderService} from "../../services";
 
 interface IState {
     orders: IOrder[],
-    updateOrder: IOrder | null,
     prev: string | null,
     next: string | null,
     total_pages: number | null,
@@ -16,7 +15,6 @@ interface IState {
 
 const initialState: IState = {
     orders: [],
-    updateOrder: null,
     prev: null,
     next: null,
     total_pages: null,
@@ -37,11 +35,11 @@ const getAll = createAsyncThunk<IOrderPainted, { page: number, order: string }>(
     }
 );
 
-const createComment = createAsyncThunk<IComment, { comment: string , orderId: number}>(
+const createComment = createAsyncThunk<IComment, { comment: string, orderId: number }>(
     'carSlice/create',
-    async ({comment,orderId}, {rejectWithValue}) => {
+    async ({comment, orderId}, {rejectWithValue}) => {
         try {
-            const {data} =  await orderService.createComment(comment,orderId)
+            const {data} = await orderService.createComment(comment, orderId)
             return data
         } catch (e) {
             const err = e as AxiosError
@@ -62,23 +60,34 @@ const orderSlice = createSlice({
     extraReducers: (builder) =>
         builder
             .addCase(getAll.fulfilled, (state, action) => {
-            const {items, prev, next, total_pages} = action.payload;
-            state.orders = items;
-            state.next = next;
-            state.prev = prev;
-            state.total_pages = total_pages;
-        })
-
+                const {items, prev, next, total_pages} = action.payload;
+                state.orders = items;
+                state.next = next;
+                state.prev = prev;
+                state.total_pages = total_pages;
+            })
             .addCase(createComment.fulfilled, (state, action) => {
-                const { orderId } = action.payload;
-                state.orders = state.orders.map((order) =>
-                    order.id === orderId
-                        ? { ...order, comments: [...order.comments, action.payload] }
-                        : order
-                );
-            }),
-});
+                const {orderId, manager} = action.payload;
 
+                state.orders = state.orders.map((order) => {
+                    if (order.id === orderId) {
+                        const updatedOrder = {...order, comments: [...order.comments, action.payload]};
+
+                        if (updatedOrder.status === null || updatedOrder.status === 'New') {
+                            updatedOrder.status = 'In Work';
+                        }
+                        if(manager){
+                            updatedOrder.manager = manager
+                        }
+
+                        return updatedOrder;
+                    } else {
+                        return order;
+                    }
+                });
+            }),
+
+});
 
 
 const {reducer: orderReducer, actions: {setSortedColumn}} = orderSlice;

@@ -23,7 +23,9 @@ const Header: FC<IProps>  = () => {
     };
 
     useEffect(() => {
-        if (!me && authService.getAccessToken()) {
+        const accessToken = authService.getAccessToken();
+
+        if (!me && accessToken) {
             dispatch(authActions.me())
         }
     }, [me, dispatch])
