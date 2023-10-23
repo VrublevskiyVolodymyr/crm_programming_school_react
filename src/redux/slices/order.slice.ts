@@ -5,7 +5,7 @@ import {IComment, IOrder, IOrderPainted} from "../../interfaces";
 import {orderService} from "../../services";
 
 interface IState {
-    orders: IOrder[],
+    orders: IOrder[] ,
     prev: string | null,
     next: string | null,
     total_pages: number | null,
@@ -34,6 +34,19 @@ const getAll = createAsyncThunk<IOrderPainted, { page: number, order: string }>(
         }
     }
 );
+
+const update = createAsyncThunk<IOrder, { order: IOrder, id: number }>(
+    'orderSlice/update',
+    async ({id, order}, {rejectWithValue}) => {
+        try {
+            const {data} = await orderService.updateById(id, order)
+            return data
+        } catch (e) {
+            const err = e as AxiosError
+            return rejectWithValue(err.response?.data)
+        }
+    }
+)
 
 const createComment = createAsyncThunk<IComment, { comment: string, orderId: number }>(
     'carSlice/create',
@@ -85,7 +98,19 @@ const orderSlice = createSlice({
                         return order;
                     }
                 });
-            }),
+            })
+            .addCase(update.fulfilled, (state, action) => {
+                const { id, ...updatedOrder } = action.payload;
+
+                state.orders = state.orders.map((order) => {
+                    if (order.id === id) {
+                        const updated = { ...order, ...updatedOrder };
+
+                        return updated;
+                    }
+                    return order;
+                });
+            })
 
 });
 
@@ -95,6 +120,7 @@ const {reducer: orderReducer, actions: {setSortedColumn}} = orderSlice;
 const orderActions = {
     getAll,
     createComment,
+    update,
     setSortedColumn
 }
 

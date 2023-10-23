@@ -36,7 +36,7 @@ const CommentForm: FC<IProps> = ({ orderId,managerId, manager}) => {
                 <input className={"form-control"} type="text" placeholder="comment" {...register("comment", { required: true })} />
                 {errors.comment && <span>This field is required</span>}
             </div>
-            <button disabled={!isValid || !(me && me.id  && (manager===null || me.id === managerId))} type="submit" className="btn btn-success">SUBMIT</button>
+            <button disabled={!isValid || !(me && me.id  && (manager===null || me.id === managerId))} type="submit" className={css.submitButton}>SUBMIT</button>
         </form>
     );
 };

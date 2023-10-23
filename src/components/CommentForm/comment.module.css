@@ -9,8 +9,13 @@
 }
 
 
+.submitButton:disabled {
+    background-color: #d5d0d0;
+    cursor: not-allowed;
+}
+
 .submitButton {
-    background-color: #007bff;
+    background-color: #5fc664;
     color: #fff;
     padding: 5px 10px;
     border: none;

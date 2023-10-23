@@ -17,7 +17,7 @@ export interface IOrder {
     sum: number;
     msg: string;
     status: string;
-    manager: IManager;
+    manager: IManager | null;
     created: string;
     utm: string;
     comments: IComment[];

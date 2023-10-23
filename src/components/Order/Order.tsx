@@ -7,12 +7,15 @@ import {orderActions} from "../../redux";
 import css from './order.module.css';
 import {CommentForm} from "../CommentForm/CommentForm";
 import {CommentModal} from "../CommentModal/CommentModal";
+import {EditModal} from "../EditModal/EditModal";
 
 interface IProps {
     orders: IOrder[];
+    onEditOrder: (id: number, editedOrder: IOrder) => void;
+
 }
 
-const Order: FC<IProps> = ({orders}) => {
+const Order: FC<IProps> = ({orders, onEditOrder}) => {
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
     const {sortedColumn, sortDirection} = useAppSelector((state) => state.orderReducer);
     const dispatch = useAppDispatch();
@@ -20,14 +23,18 @@ const Order: FC<IProps> = ({orders}) => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const commentsPerPage = 5;
-    const [openModalIndex, setOpenModalIndex] = useState<{ [key: number]: number }>({});
+    const [openCommentModalIndex, setOpenCommentModalIndex] = useState<{ [key: number]: number }>({});
 
-    const openModal = (rowIndex: number) => {
-        setOpenModalIndex({ ...openModalIndex, [rowIndex]: rowIndex });
+    const [openEditModalIndex, setOpenEditModalIndex] = useState<{ [key: number]: number }>({});
+
+    const [editingOrder, setEditingOrder] = useState<IOrder | null>(null);
+
+    const openCommentModal = (rowIndex: number) => {
+        setOpenCommentModalIndex({ ...openCommentModalIndex, [rowIndex]: rowIndex });
     };
 
-    const closeModal = () => {
-        setOpenModalIndex({});
+    const closeCommentModal = () => {
+        setOpenCommentModalIndex({});
     };
 
     const handlePageChange = (newPage: number) => {
@@ -51,6 +58,15 @@ const Order: FC<IProps> = ({orders}) => {
         } else {
             setExpandedRows([...expandedRows, rowId]);
         }
+    };
+
+    const openEditModal = (order: IOrder | null, rowIndex: number) => {
+        setEditingOrder(order);
+        setOpenEditModalIndex({ ...openEditModalIndex, [rowIndex]: rowIndex });
+    };
+
+    const closeEditModal = () => {
+        setOpenEditModalIndex({});
     };
 
     const formatDate = (dateString: string) => {
@@ -110,7 +126,7 @@ const Order: FC<IProps> = ({orders}) => {
                                             {order.msg && <p>Message: {order.msg}</p>}
                                         </div>
                                         <div key={order.id} className={css.container}>
-                                            { order.comments.length > 0 &&  <div className={css.comments}  onClick={() => openModal(order.id)}>
+                                            { order.comments.length > 0 &&  <div className={css.comments}  onClick={() => openCommentModal(order.id)}>
                                             {order.comments.slice(-3).reverse().map((comment, index) => (
                                                 <div key={index} >
 
@@ -132,14 +148,25 @@ const Order: FC<IProps> = ({orders}) => {
                                             <div className={css.commentForm}>
                                                 <CommentForm orderId={order.id} managerId={order.manager ? order.manager.id : 0} manager={order.manager}/>
                                             </div>
-                                            {openModalIndex[order.id] !== undefined &&(
+
+                                            <button onClick={() => openEditModal(order,order.id)}>Edit</button>
+
+                                            {openEditModalIndex[order.id] !== undefined &&(
+                                            <EditModal
+                                                onClose={closeEditModal}
+                                                onEditOrder={onEditOrder}
+                                                order={editingOrder as IOrder}
+                                            />
+                                            )}
+
+                                            {openCommentModalIndex[order.id] !== undefined &&(
                                                 <CommentModal
                                                     comments={order.comments}
                                                     currentPage={currentPage}
                                                     commentsPerPage={commentsPerPage}
                                                     total_pages={Math.ceil(order.comments.length / commentsPerPage)}
                                                     onPageChange={handlePageChange}
-                                                    onClose={closeModal}
+                                                    onClose={closeCommentModal}
                                                 />
                                             )}
                                         </div>
