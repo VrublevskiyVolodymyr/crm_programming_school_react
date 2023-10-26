@@ -18,15 +18,15 @@ interface IProps {
 const Order: FC<IProps> = ({orders, onEditOrder}) => {
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
     const {sortedColumn, sortDirection} = useAppSelector((state) => state.orderReducer);
+    const {me} = useAppSelector(state => state.authReducer)
+
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState(1);
     const commentsPerPage = 5;
     const [openCommentModalIndex, setOpenCommentModalIndex] = useState<{ [key: number]: number }>({});
-
     const [openEditModalIndex, setOpenEditModalIndex] = useState<{ [key: number]: number }>({});
-
     const [editingOrder, setEditingOrder] = useState<IOrder | null>(null);
 
     const openCommentModal = (rowIndex: number) => {
@@ -149,7 +149,7 @@ const Order: FC<IProps> = ({orders, onEditOrder}) => {
                                                 <CommentForm orderId={order.id} managerId={order.manager ? order.manager.id : 0} manager={order.manager}/>
                                             </div>
 
-                                            <button onClick={() => openEditModal(order,order.id)}>Edit</button>
+                                            <button  disabled={!(me && me.id  && (order.manager===null || me.id === order.manager.id))} onClick={() => openEditModal(order,order.id) }>Edit</button>
 
                                             {openEditModalIndex[order.id] !== undefined &&(
                                             <EditModal

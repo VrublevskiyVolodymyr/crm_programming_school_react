@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {AxiosError} from "axios";
 
-import {IComment, IOrder, IOrderPainted} from "../../interfaces";
+import {IComment, IGroup, IOrder, IOrderPainted} from "../../interfaces";
 import {orderService} from "../../services";
 
 interface IState {
@@ -10,7 +10,9 @@ interface IState {
     next: string | null,
     total_pages: number | null,
     sortDirection: string,
-    sortedColumn: string
+    sortedColumn: string,
+    groups:IGroup[],
+    loading: boolean
 }
 
 const initialState: IState = {
@@ -19,8 +21,11 @@ const initialState: IState = {
     next: null,
     total_pages: null,
     sortDirection: "asc",
-    sortedColumn: ""
+    sortedColumn: "",
+    groups:[],
+    loading: true,
 };
+
 
 const getAll = createAsyncThunk<IOrderPainted, { page: number, order: string }>(
     'orderSlice/getAll',
@@ -49,10 +54,36 @@ const update = createAsyncThunk<IOrder, { order: IOrder, id: number }>(
 )
 
 const createComment = createAsyncThunk<IComment, { comment: string, orderId: number }>(
-    'carSlice/create',
+    'orderSlice/createComment',
     async ({comment, orderId}, {rejectWithValue}) => {
         try {
             const {data} = await orderService.createComment(comment, orderId)
+            return data
+        } catch (e) {
+            const err = e as AxiosError
+            return rejectWithValue(err.response?.data)
+        }
+    }
+)
+
+const getGroups = createAsyncThunk<IGroup[]>(
+    'orderSlice/getGroups',
+    async ( _, {rejectWithValue}) => {
+        try {
+            const {data} = await orderService.getGroups();
+            return data
+        } catch (e) {
+            const err = e as AxiosError;
+            return rejectWithValue(err.response?.data)
+        }
+    }
+);
+
+const createGroup = createAsyncThunk<IGroup, { name: string }>(
+    'orderSlice/createGroup',
+    async ({name}, {rejectWithValue}) => {
+        try {
+            const {data} = await orderService.createGroup(name);
             return data
         } catch (e) {
             const err = e as AxiosError
@@ -78,10 +109,11 @@ const orderSlice = createSlice({
                 state.next = next;
                 state.prev = prev;
                 state.total_pages = total_pages;
+                state.loading = false
             })
             .addCase(createComment.fulfilled, (state, action) => {
                 const {orderId, manager} = action.payload;
-
+                state.loading = false
                 state.orders = state.orders.map((order) => {
                     if (order.id === orderId) {
                         const updatedOrder = {...order, comments: [...order.comments, action.payload]};
@@ -101,7 +133,7 @@ const orderSlice = createSlice({
             })
             .addCase(update.fulfilled, (state, action) => {
                 const { id, ...updatedOrder } = action.payload;
-
+                state.loading = false
                 state.orders = state.orders.map((order) => {
                     if (order.id === id) {
                         const updated = { ...order, ...updatedOrder };
@@ -110,6 +142,18 @@ const orderSlice = createSlice({
                     }
                     return order;
                 });
+            })
+            .addCase(getGroups.fulfilled, (state, action) => {
+                state.groups = action.payload;
+                state.loading = false
+            })
+            .addCase(createGroup.fulfilled, (state, action) => {
+                state.loading = false
+                state.groups = [...state.groups, action.payload];
+            })
+            .addDefaultCase((state, actions) => {
+                const [actionStatus] = actions.type.split('/').slice(-1);
+                state.loading = actionStatus === 'pending';
             })
 
 });
@@ -121,6 +165,8 @@ const orderActions = {
     getAll,
     createComment,
     update,
+    getGroups,
+    createGroup,
     setSortedColumn
 }
 

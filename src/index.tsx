@@ -20,8 +20,8 @@ const store = setupStore();
 root.render(
     <Provider store={store}>
         {/*// @ts-expect-error*/}
-    <BrowserRouter history={history}>
-        <App />
-    </BrowserRouter>
+        <BrowserRouter history={history}>
+            <App />
+        </BrowserRouter>
     </Provider>
 );

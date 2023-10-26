@@ -1,6 +1,8 @@
 import {FC, useEffect} from 'react';
 import { FaSignOutAlt } from 'react-icons/fa';
 import {NavLink, useNavigate} from "react-router-dom";
+import {useSearchParams} from 'react-router-dom';
+
 
 import {useAppDispatch, useAppSelector} from "../../hooks";
 import {authService} from "../../services";
@@ -15,6 +17,7 @@ const Header: FC<IProps>  = () => {
     const {me} = useAppSelector(state => state.authReducer);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const [query,] = useSearchParams();
 
     const handleLogout = () => {
         authService.deleteTokens();
@@ -35,7 +38,7 @@ const Header: FC<IProps>  = () => {
     return (
         <div>
             {
-                me ?
+                me && !query.get('expSession') ?
                     <div className={css.header}>
 
                         <div >Logo</div>

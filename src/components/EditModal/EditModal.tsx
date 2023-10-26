@@ -1,7 +1,11 @@
-import {FC, useState} from 'react';
+import {FC, useState} from 'react'
+import {useForm, Controller} from 'react-hook-form';
+import Select from 'react-select';
 
 import {IOrder} from "../../interfaces";
-import css from "./editModal.module.css"
+import css from './editModal.module.css';
+import {useAppDispatch, useAppSelector} from "../../hooks";
+import {orderActions} from "../../redux";
 
 interface IProps {
     onClose: () => void;
@@ -10,181 +14,283 @@ interface IProps {
 }
 
 const EditModal: FC<IProps> = ({onClose, onEditOrder, order}) => {
-    const [group, setGroup] = useState(order?.group?.name || '');
-    const [status, setStatus] = useState(order?.status || '');
-    const [name, setName] = useState(order?.name || '');
-    const [sum, setSum] = useState(order?.sum || '');
-    const [surname, setSurname] = useState(order?.surname || '');
-    const [alreadyPaid, setAlreadyPaid] = useState(order?.alreadyPaid || '');
-    const [email, setEmail] = useState(order?.email || '');
-    const [course, setCourse] = useState(order?.course || '');
-    const [phone, setPhone] = useState(order?.phone || '');
-    const [courseFormat, setCourseFormat] = useState(order?.courseFormat || '');
-    const [age, setAge] = useState(order?.age || '');
-    const [courseType, setCourseType] = useState(order?.courseType || '');
 
-    const handleSaveClick = () => {
+    const {groups} = useAppSelector((state) => state.orderReducer);
+    const dispatch = useAppDispatch();
 
-        const editedOrder = {
-            group,
-            status,
-            name,
-            sum,
-            surname,
-            alreadyPaid,
-            email,
-            course,
-            phone,
-            courseFormat,
-            age,
-            courseType,
-        };
+    const {register, handleSubmit, control} = useForm();
+    const [isGroupButtonsVisible, setGroupButtonsVisible] = useState(false);
+    const [isSelectVisible, setSelectVisible] = useState(true);
+    const [newGroup, setNewGroup] = useState(order?.group?.name || "");
 
-        onEditOrder(order.id, editedOrder);
+    const initialGroupValue = order.group ? {
+        value: order.group.name,
+        label: order.group.name,
+    } : null;
 
+    const courseOptions = [
+        { value: 'FS', label: 'FS' },
+        { value: 'QACX', label: 'QACX' },
+        { value: 'JCX', label: 'JCX' },
+        { value: 'JSCX', label: 'JSCX' },
+        { value: 'FE', label: 'FE' },
+        { value: 'PCX', label: 'PCX' },
+    ];
+
+    const statusOptions = [
+        { value: 'In work', label: 'In work' },
+        { value: 'New', label: 'New' },
+        { value: 'Agree', label: 'Agree' },
+        { value: 'Disagree', label: 'Disagree' },
+    ];
+
+    const courseTypeOptions = [
+        { value: 'pro', label: 'pro' },
+        { value: 'minimal', label: 'minimal' },
+        { value: 'premium', label: 'premium' },
+        { value: 'incubator', label: 'incubator' },
+        { value: 'vip', label: 'vip' },
+    ];
+
+    const courseFormatOptions = [
+        { value: 'static', label: 'static' },
+        { value: 'online', label: 'online' },
+    ];
+
+
+    const customStyles = {
+        control: (provided: any, state: any) => ({
+            ...provided,
+            border: 'none',
+            backgroundColor: 'transparent',
+        }),
+        indicatorSeparator: (provided: any) => ({
+            ...provided,
+            display: 'none',
+        }),
+        menu: (provided: any) => ({
+            ...provided,
+            background: "#ededed",
+        }),
+    };
+
+    const onSubmit = (data: any) => {
+        onEditOrder(order.id, data);
         onClose();
     };
+
+    const handleAddGroup = (newGroupName: string) => {
+        dispatch(orderActions.createGroup({ name: newGroupName }));
+        setNewGroup("");
+    };
+
+    const handleSelectGroup = () => {
+        setSelectVisible(true);
+        setGroupButtonsVisible(false);
+        setNewGroup("");
+    };
+
+    const toggleGroupButtons = () => {
+        setGroupButtonsVisible(!isGroupButtonsVisible);
+        setSelectVisible(false);
+        setNewGroup("");
+    };
+
 
     return (
         <div className={css.modal}>
             <div className={css.modalContent}>
-                <div className={css.scrollableContainer}>
-                    <div className={css.inputGroup}>
-                        <div className={css.inputRow}>
-                            <label htmlFor="group">Group:</label>
-                            <input
-                                type="text"
-                                id="group"
-                                value={group}
-                                onChange={(e) => setGroup(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="status">Status:</label>
-                            <input
-                                type="text"
-                                id="status"
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="name">Name:</label>
-                            <input
-                                type="text"
-                                id="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="sum">Sum:</label>
-                            <input
-                                type="text"
-                                id="sum"
-                                value={sum}
-                                onChange={(e) => setSum(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="surname">Surname:</label>
-                            <input
-                                type="text"
-                                id="surname"
-                                value={surname}
-                                onChange={(e) => setSurname(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="alreadyPaid">Already Paid:</label>
-                            <input
-                                type="text"
-                                id="alreadyPaid"
-                                value={alreadyPaid}
-                                onChange={(e) => setAlreadyPaid(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="email">Email:</label>
-                            <input
-                                type="text"
-                                id="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="course">Course:</label>
-                            <input
-                                type="text"
-                                id="course"
-                                value={course}
-                                onChange={(e) => setCourse(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="phone">Phone:</label>
-                            <input
-                                type="text"
-                                id="phone"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="courseFormat">Course Format:</label>
-                            <input
-                                type="text"
-                                id="courseFormat"
-                                value={courseFormat}
-                                onChange={(e) => setCourseFormat(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="age">Age:</label>
-                            <input
-                                type="text"
-                                id="age"
-                                value={age}
-                                onChange={(e) => setAge(e.target.value)}
-                                className={css.input}
-                            />
-                        </div>
-                        <div className={css.inputRow}>
-                            <label htmlFor="courseType">Course Type:</label>
-                            <input
-                                type="text"
-                                id="courseType"
-                                value={courseType}
-                                onChange={(e) => setCourseType(e.target.value)}
-                                className={css.input}
-                            />
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className={css.scrollableContainer}>
+                        <div className={css.inputGroup}>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="group">Group</label>
+                                {isSelectVisible ? (
+                                    <Controller
+                                        key="select"
+                                        control={control}
+                                        name="group"
+                                        render={({ field }) => (
+                                            <Select
+                                                className={css.custom_select}
+                                                classNamePrefix="select"
+                                                defaultValue={initialGroupValue}
+                                                styles={customStyles}
+                                                maxMenuHeight={220}
+                                                menuPlacement="auto"
+                                                name="group"
+                                                options={groups.map((group) => ({
+                                                    value: group.name,
+                                                    label: group.name,
+                                                }))}
+                                                onChange={(selectedOption) => {
+                                                    field.onChange(selectedOption ? selectedOption.value : '');
+                                                }}
+                                            />
+                                        )}
+                                    />
+
+                                ) : (
+                                <input type="text" id="group"  placeholder={"group"} {...register('group')} value={newGroup}
+                                       onChange={(e) => setNewGroup(e.target.value)}
+                                       className={css.input}/>
+                                )}
+                                {!isGroupButtonsVisible && (
+                                    <button type="button" onClick={toggleGroupButtons}
+                                            className={css.add_group_button}>ADD GROUP</button>)}
+                                {isGroupButtonsVisible && (
+                                    <div className={css.group_buttons}>
+                                        <button type="button" onClick={() => handleAddGroup(newGroup)} className={css.add_button}>ADD</button>
+                                        <button type="button" onClick={handleSelectGroup} className={css.select_button}>SELECT</button>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className={css.inputRow}><label htmlFor="status">Status</label>
+                                <Controller
+                                    name="status"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            className={css.custom_select}
+                                            classNamePrefix="select"
+                                            defaultValue={statusOptions.find((option) => option.value === order?.status)}
+                                            options={statusOptions}
+                                            styles={customStyles}
+                                            maxMenuHeight={250}
+                                            {...field}
+                                            value={statusOptions.find((option) => option.value === field.value)}
+                                            onChange={(selectedOption) => {
+                                                field.onChange(selectedOption ? selectedOption.value : '');
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="name">Name</label>
+                                <input type="text" id="name" placeholder={"name"} {...register('name')} defaultValue={order?.name || ''}
+                                       className={css.input}/>
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="sum">Sum</label>
+                                <input type="text" id="sum" placeholder={"sum"} {...register('sum')} defaultValue={order?.sum || ''}
+                                       className={css.input}/>
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="surname">Surname</label>
+                                <input type="text" id="surname" placeholder={"surname"} {...register('surname')}
+                                       defaultValue={order?.surname || ''} className={css.input}/>
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="alreadyPaid">Already Paid</label>
+                                <input type="text" id="alreadyPaid" placeholder={"alreadyPaid"} {...register('alreadyPaid')}
+                                       defaultValue={order?.alreadyPaid || ''} className={css.input}/>
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="email">Email</label>
+                                <input type="text" id="email" placeholder={"email"} {...register('email')} defaultValue={order?.email || ''}
+                                       className={css.input}/>
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="course">Course</label>
+                                <Controller
+                                    name="course"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            className={css.custom_select}
+                                            classNamePrefix="select"
+                                            defaultValue={courseOptions.find((option) => option.value === order?.course)}
+                                            options={courseOptions}
+                                            styles={customStyles}
+                                            maxMenuHeight={250}
+                                            {...field}
+                                            value={courseOptions.find((option) => option.value === field.value)}
+                                            onChange={(selectedOption) => {
+                                                field.onChange(selectedOption ? selectedOption.value : '');
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="phone">Phone</label>
+                                <input type="text" id="phone" placeholder={"phone"} {...register('phone')} defaultValue={order?.phone || ''}
+                                       className={css.input}/>
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="courseFormat">Course Format</label>
+                                <Controller
+                                    name="courseFormat"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            className={css.custom_select}
+                                            classNamePrefix="select"
+                                            defaultValue={courseFormatOptions.find((option) => option.value === order?.courseFormat)}
+                                            options={courseFormatOptions}
+                                            styles={customStyles}
+                                            maxMenuHeight={250}
+                                            {...field}
+                                            value={courseFormatOptions.find((option) => option.value === field.value)}
+                                            onChange={(selectedOption) => {
+                                                field.onChange(selectedOption ? selectedOption.value : '');
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="age">Age</label>
+                                <input type="text" id="age" placeholder={"age"} {...register('age')} defaultValue={order?.age || ''}
+                                       className={css.input}/>
+                            </div>
+
+                            <div className={css.inputRow}>
+                                <label htmlFor="courseType">Course Type</label>
+                                <Controller
+                                    name="courseType"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            className={css.custom_select}
+                                            classNamePrefix="select"
+                                            defaultValue={courseTypeOptions.find((option) => option.value === order?.courseType)}
+                                            options={courseTypeOptions}
+                                            styles={customStyles}
+                                            maxMenuHeight={250}
+                                            menuPlacement="top"
+                                            {...field}
+                                            value={courseTypeOptions.find((option) => option.value === field.value)}
+                                            onChange={(selectedOption) => {
+                                                field.onChange(selectedOption ? selectedOption.value : '');
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </div>
+
                         </div>
                     </div>
-                </div>
-                <div className={css.buttonRow}>
-                    <button onClick={handleSaveClick} className={css.submitButton}>
-                        SUBMIT
-                    </button>
-                    <button onClick={onClose} className={css.closeButton}>
-                        CLOSE
-                    </button>
-                </div>
+                    <div className={css.buttonRow}>
+                        <button type="submit" className={css.submitButton}>SUBMIT</button>
+                        <button type="button" onClick={onClose} className={css.closeButton}>CLOSE</button>
+                    </div>
+                </form>
             </div>
         </div>
     );
 };
-
-
 
 export {EditModal};

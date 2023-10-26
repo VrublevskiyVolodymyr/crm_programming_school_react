@@ -84,6 +84,9 @@ tr:hover {
     margin: 10px;
 }
 
-
+button:disabled {
+    background-color: #d5d0d0;
+    cursor: not-allowed;
+}
 
 

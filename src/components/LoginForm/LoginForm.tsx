@@ -46,11 +46,11 @@ const LoginForm = () => {
         <form onSubmit={handleSubmit(login)} className={css.loginForm}>
             <div className={css.formGroup}>
                 <label>Email</label>
-            <input className={"form-control"} type="email" placeholder={'username'} {...register('username', {required: true})} onChange={handleInputChange} />
+                <input className={"form-control"} type="email" placeholder={'username'} {...register('username', {required: true})} onChange={handleInputChange} />
             </div>
             <div className={css.formGroup}>
                 <label>Password</label>
-            <input className={"form-control"} type="password" placeholder={'password'} {...register('password', {required: true})} onChange={handleInputChange} />
+                <input className={"form-control"} type="password" placeholder={'password'} {...register('password', {required: true})} onChange={handleInputChange} />
             </div>
             <button className="btn btn-success" onClick={handleButtonSubmit}>Login</button>
             {showError && error && <p>{error.error}</p>}

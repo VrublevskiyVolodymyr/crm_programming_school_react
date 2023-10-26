@@ -23,8 +23,8 @@ const urls = {
     },
     orders: {
         orders: orders,
-        updade:(id:number):string => `orders/${id}`,
-        сomments:(orderId:number):string => `orders/${orderId}/comments`,
+        update:(id:number):string => `orders/${id}`,
+        comments:(orderId:number):string => `orders/${orderId}/comments`,
     },
     me:`${users}/me`
 

@@ -1,7 +1,12 @@
 import {FC} from 'react';
+import {createBrowserHistory} from 'history';
+
 
 import {LoginForm} from "../../components";
 import css from './login.module.css'
+import {useAppSelector} from "../../hooks";
+import {authService} from "../../services";
+import {OrderPage} from "../OrderPage/OrderPage";
 
 interface IProps {
 
@@ -9,9 +14,26 @@ interface IProps {
 
 const LoginPage: FC<IProps> = () => {
 
+    const history = createBrowserHistory({window});
+    const {me} = useAppSelector(state => state.authReducer);
+const accessToken = authService.getAccessToken();
+
+    if (me && authService.getAccessToken()) {
+        history.replace('/orders');
+    }
+
+
     return (
-        <div className={css.loginPage}>
-            <LoginForm/>
+        <div>
+            {
+                !accessToken ?
+
+                    <div className={css.loginPage}>
+                        <LoginForm/>
+                    </div>
+                    :
+                    <OrderPage/>
+            }
         </div>
     );
 };

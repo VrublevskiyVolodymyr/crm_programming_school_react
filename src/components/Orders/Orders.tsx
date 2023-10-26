@@ -6,12 +6,13 @@ import {useAppDispatch, useAppSelector} from "../../hooks";
 import {orderActions} from "../../redux";
 import {Pagination} from "../Pagination/Pagination";
 import {IOrder} from "../../interfaces";
+import {Loader2} from "../Loaders/Loader2/Loader2";
 
 interface IProps {
 }
 
 const Orders: FC<IProps> = () => {
-    const {orders, total_pages} = useAppSelector((state) => state.orderReducer);
+    const {orders, total_pages, loading} = useAppSelector((state) => state.orderReducer);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
@@ -32,11 +33,15 @@ const Orders: FC<IProps> = () => {
         dispatch(orderActions.getAll({page: currentPage, order: orderBy}));
     }, [currentPage, orderBy, dispatch]);
 
+    useEffect(() => {
+        dispatch(orderActions.getGroups());
+    }, [dispatch]);
 
     return (
         <div>
             <Order orders={orders} onEditOrder={handleEditOrder}/>
-            <Pagination
+            {loading && <Loader2/>}
+                <Pagination
                 pageCount={total_pages || 1}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
