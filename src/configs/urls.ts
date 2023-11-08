@@ -1,4 +1,3 @@
-import {IComment} from "../interfaces";
 
 const baseURL = "http://localhost:8080/api/v1"
 
@@ -7,6 +6,7 @@ const auth = "/auth"
 const groups = "/groups"
 const orders = "/orders"
 const users = "/users"
+const excel = "/orders/excel"
 
 const urls = {
     auth: {
@@ -25,6 +25,7 @@ const urls = {
         orders: orders,
         update:(id:number):string => `orders/${id}`,
         comments:(orderId:number):string => `orders/${orderId}/comments`,
+        excel: excel
     },
     me:`${users}/me`
 

@@ -50,9 +50,7 @@
 }
 
 .scrollableContainer {
-    max-height: 100vh;;
-    overflow-y: auto;
-
+    max-height: 100vh;
 }
 
 .buttonRow {
@@ -135,3 +133,10 @@ button:hover{
 }
 
 
+.select__menu {
+    max-height: none;
+}
+
+.select__menu-list {
+    padding-right: 0;
+}

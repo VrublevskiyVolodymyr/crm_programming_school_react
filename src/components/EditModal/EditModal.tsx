@@ -23,10 +23,18 @@ const EditModal: FC<IProps> = ({onClose, onEditOrder, order}) => {
     const [isSelectVisible, setSelectVisible] = useState(true);
     const [newGroup, setNewGroup] = useState(order?.group?.name || "");
 
-    const initialGroupValue = order.group ? {
-        value: order.group.name,
-        label: order.group.name,
-    } : null;
+    const initialGroupValue = order.group
+        ? { value: order.group.name, label: order.group.name }
+        : { value: null, label: "all groups" };
+
+    const groupOptions = [
+        { value: null, label: "all groups" },
+        ...groups.map((group) => ({
+            value: group.name,
+            label: group.name,
+        })),
+    ];
+
 
     const courseOptions = [
         { value: 'FS', label: 'FS' },
@@ -35,6 +43,8 @@ const EditModal: FC<IProps> = ({onClose, onEditOrder, order}) => {
         { value: 'JSCX', label: 'JSCX' },
         { value: 'FE', label: 'FE' },
         { value: 'PCX', label: 'PCX' },
+        { value: null, label: 'all courses' }
+
     ];
 
     const statusOptions = [
@@ -42,6 +52,8 @@ const EditModal: FC<IProps> = ({onClose, onEditOrder, order}) => {
         { value: 'New', label: 'New' },
         { value: 'Agree', label: 'Agree' },
         { value: 'Disagree', label: 'Disagree' },
+        { value: null, label: 'all statuses' }
+
     ];
 
     const courseTypeOptions = [
@@ -50,11 +62,13 @@ const EditModal: FC<IProps> = ({onClose, onEditOrder, order}) => {
         { value: 'premium', label: 'premium' },
         { value: 'incubator', label: 'incubator' },
         { value: 'vip', label: 'vip' },
+        { value: null, label: 'all courseTypes' }
     ];
 
     const courseFormatOptions = [
         { value: 'static', label: 'static' },
         { value: 'online', label: 'online' },
+        { value: null, label: 'all courseFormats'}
     ];
 
 
@@ -74,10 +88,18 @@ const EditModal: FC<IProps> = ({onClose, onEditOrder, order}) => {
         }),
     };
 
-    const onSubmit = (data: any) => {
-        onEditOrder(order.id, data);
+    const onSubmit = (data: { [key: string]: any }) => {
+        const filteredData = Object.keys(data).reduce((acc, key) => {
+            if (data[key] !== null && data[key] !== "") {
+                acc[key] = data[key];
+            }
+            return acc;
+        }, {} as { [key: string]: any });
+
+        onEditOrder(order.id, filteredData);
         onClose();
     };
+
 
     const handleAddGroup = (newGroupName: string) => {
         dispatch(orderActions.createGroup({ name: newGroupName }));
@@ -120,10 +142,7 @@ const EditModal: FC<IProps> = ({onClose, onEditOrder, order}) => {
                                                 maxMenuHeight={220}
                                                 menuPlacement="auto"
                                                 name="group"
-                                                options={groups.map((group) => ({
-                                                    value: group.name,
-                                                    label: group.name,
-                                                }))}
+                                                options={groupOptions}
                                                 onChange={(selectedOption) => {
                                                     field.onChange(selectedOption ? selectedOption.value : '');
                                                 }}

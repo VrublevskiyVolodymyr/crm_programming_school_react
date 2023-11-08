@@ -11,6 +11,7 @@ import {useState} from "react";
 const LoginForm = () => {
     const dispatch = useAppDispatch();
     const {error} = useAppSelector(state => state.authReducer);
+    const {loading} = useAppSelector(state => state.orderReducer);
 
     const navigate = useNavigate();
     const {handleSubmit, register, formState: {}} = useForm<ITokenPair>({});
@@ -52,7 +53,7 @@ const LoginForm = () => {
                 <label>Password</label>
                 <input className={"form-control"} type="password" placeholder={'password'} {...register('password', {required: true})} onChange={handleInputChange} />
             </div>
-            <button className="btn btn-success" onClick={handleButtonSubmit}>Login</button>
+            <button className={css.loginButton} onClick={handleButtonSubmit}>{loading ? 'LOADING...' : 'LOGIN'}</button>
             {showError && error && <p>{error.error}</p>}
         </form>
     );

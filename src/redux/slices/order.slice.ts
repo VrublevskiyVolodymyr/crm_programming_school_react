@@ -6,13 +6,18 @@ import {orderService} from "../../services";
 
 interface IState {
     orders: IOrder[] ,
-    prev: string | null,
+    prev: string | null ,
     next: string | null,
     total_pages: number | null,
     sortDirection: string,
     sortedColumn: string,
     groups:IGroup[],
-    loading: boolean
+    loading: boolean,
+    isFilterVisible: boolean,
+    queryFromFilter: string | null,
+    orderBy: string | null,
+    shouldResetFilters: boolean
+    excel: Blob | File | null;
 }
 
 const initialState: IState = {
@@ -24,14 +29,36 @@ const initialState: IState = {
     sortedColumn: "",
     groups:[],
     loading: true,
+    isFilterVisible: false,
+    queryFromFilter: null,
+    orderBy: null,
+    shouldResetFilters: false,
+    excel: null
 };
 
 
-const getAll = createAsyncThunk<IOrderPainted, { page: number, order: string }>(
+const getAll = createAsyncThunk<IOrderPainted, { page?: number, order?: string, name?: string, surname?: string, email?: string,
+    phone?: string, age?: string, course?: string, courseFormat?: string, courseType?: string, status?: string, group?: string, startDate?: string, endDate?: string,
+    my?: string  }>(
     'orderSlice/getAll',
-    async ({page, order}, {rejectWithValue}) => {
+    async ({page, order,name,surname, email,phone, age,course,courseFormat,courseType,group,startDate,endDate,my, status}, {rejectWithValue}) => {
         try {
-            const {data} = await orderService.getAll(page, order);
+            const {data} = await orderService.getAll(page, order,name,surname, email,phone, age,course,courseFormat,courseType,status,group,startDate,endDate,my);
+            return data
+        } catch (e) {
+            const err = e as AxiosError;
+            return rejectWithValue(err.response?.data)
+        }
+    }
+);
+
+const exportToExcel = createAsyncThunk<IOrderPainted, { page?: number, order?: string, name?: string, surname?: string, email?: string,
+    phone?: string, age?: string, course?: string, courseFormat?: string, courseType?: string, status?: string, group?: string, startDate?: string, endDate?: string,
+    my?: string  }>(
+    'orderSlice/exportToExcel',
+    async ({page, order,name,surname, email,phone, age,course,courseFormat,courseType,group,startDate,endDate,my, status}, {rejectWithValue}) => {
+        try {
+            const {data} = await orderService.exportToExcel(page, order,name,surname, email,phone, age,course,courseFormat,courseType,status,group,startDate,endDate,my);
             return data
         } catch (e) {
             const err = e as AxiosError;
@@ -100,6 +127,18 @@ const orderSlice = createSlice({
             state.sortedColumn = action.payload.columnKey;
             state.sortDirection = action.payload.newSortDirection;
         },
+        setFilterVisible: (state, action) => {
+            state.isFilterVisible = action.payload;
+        },
+        setQueryFromFilter: (state, action) => {
+            state.queryFromFilter = action.payload;
+        },
+        setOrderBy: (state, action) => {
+            state.orderBy = action.payload;
+        },
+        setShouldResetFilters: (state, action) => {
+            state.shouldResetFilters = action.payload;
+        },
     },
     extraReducers: (builder) =>
         builder
@@ -109,6 +148,10 @@ const orderSlice = createSlice({
                 state.next = next;
                 state.prev = prev;
                 state.total_pages = total_pages;
+                state.loading = false
+            })
+            .addCase(exportToExcel.fulfilled, (state, action) => {
+
                 state.loading = false
             })
             .addCase(createComment.fulfilled, (state, action) => {
@@ -159,15 +202,21 @@ const orderSlice = createSlice({
 });
 
 
-const {reducer: orderReducer, actions: {setSortedColumn}} = orderSlice;
+const {reducer: orderReducer, actions: {setSortedColumn,setFilterVisible,setQueryFromFilter,setOrderBy, setShouldResetFilters}} = orderSlice;
 
 const orderActions = {
     getAll,
+    exportToExcel,
     createComment,
     update,
     getGroups,
     createGroup,
-    setSortedColumn
+    setFilterVisible,
+    setSortedColumn,
+    setQueryFromFilter,
+    setOrderBy,
+    setShouldResetFilters
+
 }
 
 export {orderReducer, orderActions}

@@ -28,14 +28,14 @@ input[type="password"] {
 .loginButton{
     width: 100%;
     padding: 10px;
-    background-color: #007bff;
+    background-color: #439f47;
     color: #fff;
     border: none;
-    border-radius: 3px;
+    border-radius: 10px;
     cursor: pointer;
 }
 
 .loginButton:hover {
-    background-color: #0056b3;
+    background-color: #367c39;
 }
 
