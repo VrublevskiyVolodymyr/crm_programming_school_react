@@ -9,6 +9,7 @@ import {Pagination} from "../Pagination/Pagination";
 import {IOrder} from "../../interfaces";
 import {Loader2} from "../Loaders/Loader2/Loader2";
 import {FilterComponent} from "../FilterComponent/FilterComponent";
+import css from './orders.module.css'
 
 interface IProps {
 }
@@ -19,7 +20,8 @@ const Orders: FC<IProps> = () => {
         isFilterVisible,
         total_pages,
         loading,
-        queryFromFilter
+        queryFromFilter,
+
     } = useAppSelector((state) => state.orderReducer);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -38,7 +40,6 @@ const Orders: FC<IProps> = () => {
     const handlePageChange = (selectedPage: number) => {
         if (orderBy) {
             dispatch(orderActions.setQueryFromFilter(null))
-
             orderBy ? navigate(`/orders?page=${selectedPage}&order=${orderBy}`) : navigate(`/orders?page=${selectedPage}`);
         } else if (queryFromFilter !== null) {
             handleFilterChange(queryFromFilter);
@@ -70,6 +71,7 @@ const Orders: FC<IProps> = () => {
                 navigate(`/orders?page=${currentPage}&${queryFromFilter}`);
             } else {
                 navigate(`/orders?page=${currentPage}&order=-id`);
+
             }
         }, delay);
 
@@ -86,7 +88,7 @@ const Orders: FC<IProps> = () => {
         dispatch(orderActions.setOrderBy(null))
         const queryData = qs.parse(queryParams, {ignoreQueryPrefix: true});
         dispatch(orderActions.setQueryFromFilter(queryParams));
-
+const page = currentPage;
         const status = queryData.status as string;
         const group = queryData.group as string;
         const course = queryData.course as string;
@@ -101,6 +103,7 @@ const Orders: FC<IProps> = () => {
         const my = queryData.my as string;
 
         dispatch(orderActions.getAll({
+            page: page,
             status: status,
             group: group,
             course: course,
@@ -118,7 +121,7 @@ const Orders: FC<IProps> = () => {
 
     const handleFilterChange = (queryParams: string) => {
         filterChange(queryParams)
-        navigate(`/orders?page=1&${queryParams}`)
+        navigate(`/orders?${queryParams}`)
     };
 
     const handleResetChange = () => {
@@ -161,7 +164,7 @@ const Orders: FC<IProps> = () => {
     }
 
     return (
-        <div>
+        <div className={css.container}>
             {isFilterVisible && <FilterComponent onFilter={handleFilterChange} onReset={handleResetChange} onFilterExcel={handleFilterExcel}/>}
             <Order orders={orders} onEditOrder={handleEditOrder}/>
             {loading && <Loader2/>}

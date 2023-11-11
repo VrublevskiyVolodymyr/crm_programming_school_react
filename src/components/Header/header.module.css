@@ -3,6 +3,7 @@
 }
 .header {
     min-height: 50px;
+    min-width: 1000px;
     background-color: #5fc664;
     font-size: 25px;
     color: snow;

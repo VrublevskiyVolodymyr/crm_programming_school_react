@@ -16,7 +16,7 @@ interface IState {
     isFilterVisible: boolean,
     queryFromFilter: string | null,
     orderBy: string | null,
-    shouldResetFilters: boolean
+    shouldResetFilters: boolean,
     excel: Blob | File | null;
 }
 
@@ -216,6 +216,7 @@ const orderActions = {
     setQueryFromFilter,
     setOrderBy,
     setShouldResetFilters
+
 
 }
 

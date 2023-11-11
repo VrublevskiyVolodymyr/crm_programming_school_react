@@ -177,6 +177,30 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
 
 
     useEffect(() => {
+        if (orderBy !== null && shouldResetFilters) {
+            const updatedFilterValues: FilterFields = {
+                name: '',
+                surname: '',
+                email: '',
+                phone: '',
+                age: '',
+                course: null,
+                courseFormat: null,
+                courseType: null,
+                status: null,
+                group: null,
+                startDate: '',
+                endDate: '',
+                my: false,
+            };
+
+            reset(updatedFilterValues);
+            dispatch(orderActions.setShouldResetFilters(false));
+        }
+    }, [reset, orderBy, shouldResetFilters, dispatch]);
+
+
+    useEffect(() => {
         const queryData = qs.parse(window.location.search, {ignoreQueryPrefix: true});
         reset(queryData);
     }, [reset]);

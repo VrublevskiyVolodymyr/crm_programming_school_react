@@ -76,7 +76,7 @@ const Order: FC<IProps> = ({orders, onEditOrder}) => {
     }
 
     return (
-        <div>
+        <div className={css.tableContainer}>
             <table className={css.table}>
                 <thead>
                 <tr className={css.tr}>
