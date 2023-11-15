@@ -1,6 +1,6 @@
 import {FC, useEffect, useState} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import qs from 'qs';
+import qs, {ParsedQs} from 'qs';
 
 import {Order} from "../Order/Order";
 import {useAppDispatch, useAppSelector} from "../../hooks";
@@ -30,24 +30,24 @@ const Orders: FC<IProps> = () => {
     const currentPage = query.get('page') ? parseInt(query.get('page') as string, 10) : 1;
     const orderBy = query.get('order') || "";
 
-    const queryData = qs.parse(window.location.search, { ignoreQueryPrefix: true });
-    const filterParams = ['status', 'group', 'course', 'courseFormat', 'courseType', 'name', 'surname', 'email', 'age', 'startDate', 'endDate', 'my'];
+    const queryData = qs.parse(window.location.search, {ignoreQueryPrefix: true});
+    const filterParams = ['status', 'group', 'course', 'courseFormat', 'courseType', 'name', 'surname', 'email', 'phone', 'age', 'startDate', 'endDate', 'my'];
     const isFilterQuery = filterParams.some(param => queryData[param]);
-    const queryString = qs.stringify(queryData, { addQueryPrefix: true });
-
-
+    const queryString = qs.stringify(queryData, {addQueryPrefix: true});
 
     const handlePageChange = (selectedPage: number) => {
+
         if (orderBy) {
             dispatch(orderActions.setQueryFromFilter(null))
             orderBy ? navigate(`/orders?page=${selectedPage}&order=${orderBy}`) : navigate(`/orders?page=${selectedPage}`);
         } else if (queryFromFilter !== null) {
             handleFilterChange(queryFromFilter);
             navigate(`/orders?page=${selectedPage}&${queryFromFilter}`)
-        } else if(isFilterQuery){
+        } else if (isFilterQuery) {
             handleFilterChange(queryString);
             navigate(`/orders?page=${selectedPage}&${queryString}`)
         }
+
     };
 
     const handleEditOrder = (orderId: number, editedOrderData: IOrder) => {
@@ -56,7 +56,7 @@ const Orders: FC<IProps> = () => {
 
 
     useEffect(() => {
-        const delay = 20;
+        const delay = 30;
 
         const timer = setTimeout(() => {
             if (orderBy) {
@@ -71,7 +71,6 @@ const Orders: FC<IProps> = () => {
                 navigate(`/orders?page=${currentPage}&${queryFromFilter}`);
             } else {
                 navigate(`/orders?page=${currentPage}&order=-id`);
-
             }
         }, delay);
 
@@ -87,8 +86,11 @@ const Orders: FC<IProps> = () => {
     function filterChange(queryParams: string) {
         dispatch(orderActions.setOrderBy(null))
         const queryData = qs.parse(queryParams, {ignoreQueryPrefix: true});
-        dispatch(orderActions.setQueryFromFilter(queryParams));
-const page = currentPage;
+        delete queryData.page;
+        const queryDataToParams = Object.keys(queryData).map(key => `${key}=${queryData[key]}`).join('&');
+        dispatch(orderActions.setQueryFromFilter(queryDataToParams));
+
+        const page = currentPage;
         const status = queryData.status as string;
         const group = queryData.group as string;
         const course = queryData.course as string;
@@ -97,6 +99,7 @@ const page = currentPage;
         const name = queryData.name as string;
         const surname = queryData.surname as string;
         const email = queryData.email as string;
+        const phone = queryData.phone as string;
         const age = queryData.age as string;
         const startDate = queryData.startDate as string;
         const endDate = queryData.endDate as string;
@@ -112,6 +115,7 @@ const page = currentPage;
             name: name,
             surname: surname,
             email: email,
+            phone: phone,
             age: age,
             startDate: startDate,
             endDate: endDate,
@@ -142,6 +146,7 @@ const page = currentPage;
         const name = queryData.name as string;
         const surname = queryData.surname as string;
         const email = queryData.email as string;
+        const phone = queryData.phone as string;
         const age = queryData.age as string;
         const startDate = queryData.startDate as string;
         const endDate = queryData.endDate as string;
@@ -156,16 +161,19 @@ const page = currentPage;
             name: name,
             surname: surname,
             email: email,
+            phone: phone,
             age: age,
             startDate: startDate,
             endDate: endDate,
             my: my
         }));
+
     }
 
     return (
         <div className={css.container}>
-            {isFilterVisible && <FilterComponent onFilter={handleFilterChange} onReset={handleResetChange} onFilterExcel={handleFilterExcel}/>}
+            {isFilterVisible && <FilterComponent onFilter={handleFilterChange} onReset={handleResetChange}
+                                                 onFilterExcel={handleFilterExcel}/>}
             <Order orders={orders} onEditOrder={handleEditOrder}/>
             {loading && <Loader2/>}
             <Pagination
@@ -175,6 +183,7 @@ const page = currentPage;
                 isFirstPage={currentPage === 1}
                 isLastPage={currentPage === total_pages}
             />
+
         </div>
     );
 };

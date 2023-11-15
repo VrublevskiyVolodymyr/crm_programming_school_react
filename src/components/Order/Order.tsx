@@ -101,7 +101,7 @@ const Order: FC<IProps> = ({orders, onEditOrder}) => {
                 {orders.map((order) => (
                     <React.Fragment key={order.id}>
                         <tr onClick={() => toggleRow(order.id)}>
-                            <td>{order.id || 'null'}</td>
+                            <td>{order.id  || 'null'}</td>
                             <td>{order.name || 'null'}</td>
                             <td>{order.surname || 'null'}</td>
                             <td>{order.email || 'null'}</td>

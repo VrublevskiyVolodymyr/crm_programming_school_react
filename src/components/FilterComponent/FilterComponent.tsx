@@ -25,16 +25,16 @@ interface FilterFields {
     name: string;
     surname: string;
     email: string;
-    phone: string;
+    phone: string | number;
     age: string | number;
-    course: string | null;
-    courseFormat: string | null;
-    courseType: string | null;
-    status: string | null;
-    group: string | null;
+    course: string;
+    courseFormat: string;
+    courseType: string;
+    status: string;
+    group: string;
     startDate: string;
     endDate: string;
-    my: boolean;
+    my: boolean | string;
 }
 
 
@@ -60,9 +60,12 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
     const {groups, orderBy, shouldResetFilters} = useAppSelector((state) => state.orderReducer);
     const [queryParams, setQueryParams] = useState<string>('');
     const dispatch = useAppDispatch();
+    const [typeTimerId, setTypeTimerId] = useState<NodeJS.Timeout | null>(null);
+    const {control, register, handleSubmit, reset, getValues} = useForm<FilterFields>();
+
 
     const groupOptions = [
-        {value: null, label: 'all groups'},
+        {value: '', label: 'all groups'},
         ...groups.map((group) => ({
             value: group.name,
             label: group.name,
@@ -70,7 +73,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
     ];
 
     const courseOptions = [
-        {value: null, label: 'all courses'},
+        {value: '', label: 'all courses'},
         {value: 'FS', label: 'FS'},
         {value: 'QACX', label: 'QACX'},
         {value: 'JCX', label: 'JCX'},
@@ -80,7 +83,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
     ];
 
     const statusOptions = [
-        {value: null, label: 'all statuses'},
+        {value: '', label: 'all statuses'},
         {value: 'In work', label: 'In work'},
         {value: 'New', label: 'New'},
         {value: 'Agree', label: 'Agree'},
@@ -88,7 +91,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
     ];
 
     const courseTypeOptions = [
-        {value: null, label: 'all courseTypes'},
+        {value: '', label: 'all courseTypes'},
         {value: 'pro', label: 'pro'},
         {value: 'minimal', label: 'minimal'},
         {value: 'premium', label: 'premium'},
@@ -97,7 +100,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
     ];
 
     const courseFormatOptions = [
-        {value: null, label: 'all courseFormats'},
+        {value: '', label: 'all courseFormats'},
         {value: 'static', label: 'static'},
         {value: 'online', label: 'online'},
     ];
@@ -118,8 +121,6 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
         }),
     };
 
-    const {control, register, handleSubmit, reset, getValues} = useForm<FilterFields>();
-
 
     const sendQuery = (data: FilterFields) => {
         const queryData = qs.parse(window.location.search, {ignoreQueryPrefix: true});
@@ -127,7 +128,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
         const queryParams: QueryParams = {
             ...queryData,
             ...data,
-            my: data.my===true ? data.my : ''
+            my: typeof data.my === 'boolean' && data.my === true ? data.my : ''
         };
 
 
@@ -152,11 +153,11 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
             email: '',
             phone: '',
             age: '',
-            course: null,
-            courseFormat: null,
-            courseType: null,
-            status: null,
-            group: null,
+            course: '',
+            courseFormat: '',
+            courseType: '',
+            status: '',
+            group: '',
             startDate: '',
             endDate: '',
             my: false
@@ -184,11 +185,11 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                 email: '',
                 phone: '',
                 age: '',
-                course: null,
-                courseFormat: null,
-                courseType: null,
-                status: null,
-                group: null,
+                course: '',
+                courseFormat: '',
+                courseType: '',
+                status: '',
+                group: '',
                 startDate: '',
                 endDate: '',
                 my: false,
@@ -227,7 +228,6 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
     };
 
 
-    const [typeTimerId, setTypeTimerId] = useState<NodeJS.Timeout | null>(null);
 
     const handleBooleanFieldChangeAndSendQuery = (fieldKey: keyof FilterFields, selectedValue: boolean) => {
         const updatedFilterValues = { ...filterValues, [fieldKey]: selectedValue };
@@ -255,14 +255,14 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
             email: typeof queryData.email === 'string' ? queryData.email : '',
             phone: typeof queryData.phone === 'string' ? queryData.phone : '',
             age: typeof queryData.age === 'string' ? queryData.age : '',
-            course: typeof queryData.course === 'string' ? queryData.course : null,
-            courseFormat: typeof queryData.courseFormat === 'string' ? queryData.courseFormat : null,
-            courseType: typeof queryData.courseType === 'string' ? queryData.courseType : null,
-            status: typeof queryData.status === 'string' ? queryData.status : null,
-            group: typeof queryData.group === 'string' ? queryData.group : null,
+            course: typeof queryData.course === 'string' ? queryData.course : '',
+            courseFormat: typeof queryData.courseFormat === 'string' ? queryData.courseFormat : '',
+            courseType: typeof queryData.courseType === 'string' ? queryData.courseType : '',
+            status: typeof queryData.status === 'string' ? queryData.status : '',
+            group: typeof queryData.group === 'string' ? queryData.group : '',
             startDate: typeof queryData.startDate === 'string' ? queryData.startDate : '',
             endDate: typeof queryData.endDate === 'string' ? queryData.endDate : '',
-            my: queryData.my === 'false'
+            my: queryData.my === 'true'
         };
     }
 
@@ -274,30 +274,32 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
     }, []);
 
 
-    if (orderBy !== null && shouldResetFilters) {
-        const updatedFilterValues: FilterFields = {
-            name: '',
-            surname: '',
-            email: '',
-            phone: '',
-            age: '',
-            course: null,
-            courseFormat: null,
-            courseType: null,
-            status: null,
-            group: null,
-            startDate: '',
-            endDate: '',
-            my: false,
-        };
+    useEffect(() => {
+    const updatedFilterValues: FilterFields = {
+        name: "",
+        surname: "",
+        email: "",
+        phone: "",
+        age: "",
+        course: "",
+        courseFormat: "",
+        courseType: "",
+        status: "",
+        group: "",
+        startDate: "",
+        endDate: "",
+        my: filterValues.my,
+    };
 
+    if (orderBy !== null && shouldResetFilters) {
         reset(updatedFilterValues);
         dispatch(orderActions.setShouldResetFilters(false));
-
     }
+}, [query.toString(), reset, orderBy, shouldResetFilters, dispatch]);
 
 
-    return (
+
+return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <div className={css.container}>
                 <div className={css.inputs}>
@@ -314,13 +316,12 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     styles={customStyles}
                                     maxMenuHeight={250}
                                     {...field}
-                                    value={statusOptions.find((option) => option.value === field.value)}
+                                    value={statusOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                     onChange={(selectedOption) => {
-                                        const selectedValue = selectedOption ? selectedOption.value : null;
+                                        const selectedValue = selectedOption ? selectedOption.value : '';
                                         field.onChange(selectedValue || '');
                                         handleFieldChangeAndSendQuery('status', selectedValue || '');
                                     }}
-
                                 />
                             )}
                         />
@@ -337,6 +338,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     placeholder="name"
                                     {...field}
                                     className={css.input}
+                                    value={field.value || ''}
                                     onChange={(e) => {
                                         field.onChange(e.target.value);
                                         handleFieldChange('name', e.target.value);
@@ -357,6 +359,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     placeholder="surname"
                                     {...field}
                                     className={css.input}
+                                    value={field.value || ''}
                                     onChange={(e) => {
                                         field.onChange(e.target.value);
                                         handleFieldChange('surname', e.target.value);
@@ -377,6 +380,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     placeholder="email"
                                     {...field}
                                     className={css.input}
+                                    value={field.value || ''}
                                     onChange={(e) => {
                                         field.onChange(e.target.value);
                                         handleFieldChange('email', e.target.value);
@@ -400,9 +404,9 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                 menuPlacement="auto"
                                 options={groupOptions}
                                 {...field}
-                                value={groupOptions.find((option) => option.value === field.value)}
+                                value={groupOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                 onChange={(selectedOption) => {
-                                    const selectedValue = selectedOption ? selectedOption.value : null;
+                                    const selectedValue = selectedOption ? selectedOption.value : '';
                                     field.onChange(selectedValue || '');
                                     handleFieldChangeAndSendQuery('group', selectedValue || '');
                                 }}
@@ -423,9 +427,9 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     styles={customStyles}
                                     maxMenuHeight={250}
                                     {...field}
-                                    value={courseOptions.find((option) => option.value === field.value)}
+                                    value={courseOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                     onChange={(selectedOption) => {
-                                        const selectedValue = selectedOption ? selectedOption.value : null;
+                                        const selectedValue = selectedOption ? selectedOption.value : '';
                                         field.onChange(selectedValue || '');
                                         handleFieldChangeAndSendQuery('course', selectedValue || '');
                                     }}
@@ -445,6 +449,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     placeholder="phone"
                                     {...field}
                                     className={css.input}
+                                    value={field.value || ''}
                                     onChange={(e) => {
                                         field.onChange(e.target.value);
                                         handleFieldChange('phone', e.target.value);
@@ -467,9 +472,9 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     styles={customStyles}
                                     maxMenuHeight={250}
                                     {...field}
-                                    value={courseFormatOptions.find((option) => option.value === field.value)}
+                                    value={courseFormatOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                     onChange={(selectedOption) => {
-                                        const selectedValue = selectedOption ? selectedOption.value : null;
+                                        const selectedValue = selectedOption ? selectedOption.value : '';
                                         field.onChange(selectedValue || '');
                                         handleFieldChangeAndSendQuery('courseFormat', selectedValue || '');
                                     }}
@@ -489,6 +494,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     placeholder="age"
                                     {...field}
                                     className={css.input}
+                                    value={field.value || ''}
                                     onChange={(e) => {
                                         field.onChange(e.target.value);
                                         handleFieldChange('age', e.target.value);
@@ -512,9 +518,9 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     maxMenuHeight={250}
                                     menuPlacement="top"
                                     {...field}
-                                    value={courseTypeOptions.find((option) => option.value === field.value)}
+                                    value={courseTypeOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                     onChange={(selectedOption) => {
-                                        const selectedValue = selectedOption ? selectedOption.value : null;
+                                        const selectedValue = selectedOption ? selectedOption.value : '';
                                         field.onChange(selectedValue || '');
                                         handleFieldChangeAndSendQuery('courseType', selectedValue || '');
                                     }}
@@ -533,6 +539,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     placeholder="startDate"
                                     {...field}
                                     className={css.input}
+                                    value={field.value || ''}
                                     onChange={(e) => {
                                         field.onChange(e.target.value);
                                         handleFieldChange('startDate', e.target.value);
@@ -553,6 +560,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                     placeholder="endDate"
                                     {...field}
                                     className={css.input}
+                                    value={field.value || ''}
                                     onChange={(e) => {
                                         field.onChange(e.target.value);
                                         handleFieldChange('endDate', e.target.value);
@@ -577,10 +585,11 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
                                         field.onChange(e.target.checked);
                                         handleFieldChange('my', e.target.checked);
                                     }}
-                                    checked={field.value}
+                                    checked={Boolean(field.value)}
                                 />
                             )}
                         />
+
                     </div>
                     <button type="button" onClick={(e) => {
                         e.preventDefault();
