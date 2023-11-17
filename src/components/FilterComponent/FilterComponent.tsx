@@ -5,7 +5,6 @@ import {ParsedQs} from 'qs';
 import {FaUndo, FaFileExcel} from 'react-icons/fa';
 import Select from 'react-select';
 
-
 import {useAppDispatch, useAppSelector} from '../../hooks';
 import css from './filter.module.css';
 import {useSearchParams} from "react-router-dom";
@@ -62,7 +61,6 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
     const dispatch = useAppDispatch();
     const [typeTimerId, setTypeTimerId] = useState<NodeJS.Timeout | null>(null);
     const {control, register, handleSubmit, reset, getValues} = useForm<FilterFields>();
-
 
     const groupOptions = [
         {value: '', label: 'all groups'},
@@ -144,6 +142,7 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
         const queryString = qs.stringify(queryParams, {encode: false});
         window.history.pushState({}, '', `${queryString}`);
         onFilter(`${queryString}`);
+        setQueryParams(`${queryString}`)
     };
 
     const onResetHandler = () => {
@@ -204,7 +203,8 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
     useEffect(() => {
         const queryData = qs.parse(window.location.search, {ignoreQueryPrefix: true});
         reset(queryData);
-    }, [reset]);
+        setQueryParams(qs.stringify(queryData, { encode: false }));
+    }, [reset, setQueryParams]);
 
 
     const updateQueryParams = (params: { [key: string]: any }) => {
@@ -296,6 +296,11 @@ const FilterComponent: FC<IProps> = ({onFilter, onReset, onFilterExcel}) => {
         dispatch(orderActions.setShouldResetFilters(false));
     }
 }, [query.toString(), reset, orderBy, shouldResetFilters, dispatch]);
+
+
+    const handleFilterExcel = () => {
+        onFilterExcel(queryParams);
+    };
 
 
 
@@ -597,7 +602,7 @@ return (
                     }}>
                         <FaUndo/>
                     </button>
-                    <button type="button" onClick={() => onFilterExcel(queryParams)}>
+                    <button type="button" onClick={handleFilterExcel}>
                         <FaFileExcel/>
                     </button>
                 </div>

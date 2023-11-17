@@ -1,23 +1,23 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {AxiosError} from "axios";
 
-import {IComment, IGroup, IOrder, IOrderPainted} from "../../interfaces";
+import {IComment, IGroup, IOrder, IOrderPainted, IOrderExcel} from "../../interfaces";
 import {orderService} from "../../services";
 
-interface IState {
-    orders: IOrder[] ,
-    prev: string | null ,
-    next: string | null,
-    total_pages: number | null,
-    sortDirection: string,
-    sortedColumn: string,
-    groups:IGroup[],
-    loading: boolean,
-    isFilterVisible: boolean,
-    queryFromFilter: string | null,
-    orderBy: string | null,
-    shouldResetFilters: boolean,
-    excel: Blob | File | null;
+    interface IState {
+    orders: IOrder[],
+        prev: string | null,
+        next: string | null,
+        total_pages: number | null,
+        sortDirection: string,
+        sortedColumn: string,
+        groups: IGroup[],
+        loading: boolean,
+        isFilterVisible: boolean,
+        queryFromFilter: string | null,
+        orderBy: string | null,
+        shouldResetFilters: boolean,
+        excelUrl: string | null;
 }
 
 const initialState: IState = {
@@ -27,23 +27,53 @@ const initialState: IState = {
     total_pages: null,
     sortDirection: "asc",
     sortedColumn: "",
-    groups:[],
+    groups: [],
     loading: true,
     isFilterVisible: false,
     queryFromFilter: null,
     orderBy: null,
     shouldResetFilters: false,
-    excel: null
+    excelUrl: null
 };
 
 
-const getAll = createAsyncThunk<IOrderPainted, { page?: number, order?: string, name?: string, surname?: string, email?: string,
-    phone?: string, age?: string, course?: string, courseFormat?: string, courseType?: string, status?: string, group?: string, startDate?: string, endDate?: string,
-    my?: string  }>(
+const getAll = createAsyncThunk<IOrderPainted, {
+    page?: number,
+    order?: string,
+    name?: string,
+    surname?: string,
+    email?: string,
+    phone?: string,
+    age?: string,
+    course?: string,
+    courseFormat?: string,
+    courseType?: string,
+    status?: string,
+    group?: string,
+    startDate?: string,
+    endDate?: string,
+    my?: string
+}>(
     'orderSlice/getAll',
-    async ({page, order,name,surname, email,phone, age,course,courseFormat,courseType,group,startDate,endDate,my, status}, {rejectWithValue}) => {
+    async ({
+               page,
+               order,
+               name,
+               surname,
+               email,
+               phone,
+               age,
+               course,
+               courseFormat,
+               courseType,
+               group,
+               startDate,
+               endDate,
+               my,
+               status
+           }, {rejectWithValue}) => {
         try {
-            const {data} = await orderService.getAll(page, order,name,surname, email,phone, age,course,courseFormat,courseType,status,group,startDate,endDate,my);
+            const {data} = await orderService.getAll(page, order, name, surname, email, phone, age, course, courseFormat, courseType, status, group, startDate, endDate, my);
             return data
         } catch (e) {
             const err = e as AxiosError;
@@ -52,14 +82,36 @@ const getAll = createAsyncThunk<IOrderPainted, { page?: number, order?: string, 
     }
 );
 
-const exportToExcel = createAsyncThunk<IOrderPainted, { page?: number, order?: string, name?: string, surname?: string, email?: string,
-    phone?: string, age?: string, course?: string, courseFormat?: string, courseType?: string, status?: string, group?: string, startDate?: string, endDate?: string,
-    my?: string  }>(
+const exportToExcel = createAsyncThunk<string, {
+    page?: number,
+    order?: string,
+    name?: string,
+    surname?: string,
+    email?: string,
+    phone?: string,
+    age?: string,
+    course?: string,
+    courseFormat?: string,
+    courseType?: string,
+    status?: string,
+    group?: string,
+    startDate?: string,
+    endDate?: string,
+    my?: string
+}>(
     'orderSlice/exportToExcel',
-    async ({page, order,name,surname, email,phone, age,course,courseFormat,courseType,group,startDate,endDate,my, status}, {rejectWithValue}) => {
+    async (args, {rejectWithValue}) => {
         try {
-            const {data} = await orderService.exportToExcel(page, order,name,surname, email,phone, age,course,courseFormat,courseType,status,group,startDate,endDate,my);
-            return data
+            const data = await orderService.exportToExcel(args);
+
+            if (!data) {
+                throw new Error('No data received');
+            }
+
+            const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = window.URL.createObjectURL(blob);
+
+            return url;
         } catch (e) {
             const err = e as AxiosError;
             return rejectWithValue(err.response?.data)
@@ -95,7 +147,7 @@ const createComment = createAsyncThunk<IComment, { comment: string, orderId: num
 
 const getGroups = createAsyncThunk<IGroup[]>(
     'orderSlice/getGroups',
-    async ( _, {rejectWithValue}) => {
+    async (_, {rejectWithValue}) => {
         try {
             const {data} = await orderService.getGroups();
             return data
@@ -152,8 +204,12 @@ const orderSlice = createSlice({
             })
             .addCase(exportToExcel.fulfilled, (state, action) => {
 
-                state.loading = false
+                state.excelUrl = action.payload;
+                state.loading = false;
             })
+
+
+
             .addCase(createComment.fulfilled, (state, action) => {
                 const {orderId, manager} = action.payload;
                 state.loading = false
@@ -164,7 +220,7 @@ const orderSlice = createSlice({
                         if (updatedOrder.status === null || updatedOrder.status === 'New') {
                             updatedOrder.status = 'In Work';
                         }
-                        if(manager){
+                        if (manager) {
                             updatedOrder.manager = manager
                         }
 
@@ -175,11 +231,11 @@ const orderSlice = createSlice({
                 });
             })
             .addCase(update.fulfilled, (state, action) => {
-                const { id, ...updatedOrder } = action.payload;
+                const {id, ...updatedOrder} = action.payload;
                 state.loading = false
                 state.orders = state.orders.map((order) => {
                     if (order.id === id) {
-                        const updated = { ...order, ...updatedOrder };
+                        const updated = {...order, ...updatedOrder};
 
                         return updated;
                     }
@@ -202,7 +258,10 @@ const orderSlice = createSlice({
 });
 
 
-const {reducer: orderReducer, actions: {setSortedColumn,setFilterVisible,setQueryFromFilter,setOrderBy, setShouldResetFilters}} = orderSlice;
+const {
+    reducer: orderReducer,
+    actions: {setSortedColumn, setFilterVisible, setQueryFromFilter, setOrderBy, setShouldResetFilters}
+} = orderSlice;
 
 const orderActions = {
     getAll,

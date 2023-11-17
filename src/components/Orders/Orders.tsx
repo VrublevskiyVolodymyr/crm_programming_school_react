@@ -1,12 +1,12 @@
-import {FC, useEffect, useState} from "react";
+import {FC, useEffect} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import qs, {ParsedQs} from 'qs';
+import qs from 'qs';
 
 import {Order} from "../Order/Order";
 import {useAppDispatch, useAppSelector} from "../../hooks";
 import {orderActions} from "../../redux";
 import {Pagination} from "../Pagination/Pagination";
-import {IOrder} from "../../interfaces";
+import {IOrder, IOrderExcel} from "../../interfaces";
 import {Loader2} from "../Loaders/Loader2/Loader2";
 import {FilterComponent} from "../FilterComponent/FilterComponent";
 import css from './orders.module.css'
@@ -21,7 +21,7 @@ const Orders: FC<IProps> = () => {
         total_pages,
         loading,
         queryFromFilter,
-
+        excelUrl
     } = useAppSelector((state) => state.orderReducer);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -105,22 +105,9 @@ const Orders: FC<IProps> = () => {
         const endDate = queryData.endDate as string;
         const my = queryData.my as string;
 
-        dispatch(orderActions.getAll({
-            page: page,
-            status: status,
-            group: group,
-            course: course,
-            courseFormat: courseFormat,
-            courseType: courseType,
-            name: name,
-            surname: surname,
-            email: email,
-            phone: phone,
-            age: age,
-            startDate: startDate,
-            endDate: endDate,
-            my: my
-        }));
+        dispatch(orderActions.getAll({page: page, status: status, group: group, course: course, courseFormat: courseFormat,
+            courseType: courseType, name: name, surname: surname, email: email, phone: phone, age: age, startDate: startDate,
+            endDate: endDate, my: my}));
     }
 
     const handleFilterChange = (queryParams: string) => {
@@ -134,10 +121,10 @@ const Orders: FC<IProps> = () => {
         dispatch(orderActions.setQueryFromFilter(null))
     };
 
-
     function handleFilterExcel(queryParams: string) {
         const queryData = qs.parse(queryParams, {ignoreQueryPrefix: true});
 
+        const page = currentPage.toString();
         const status = queryData.status as string;
         const group = queryData.group as string;
         const course = queryData.course as string;
@@ -152,40 +139,53 @@ const Orders: FC<IProps> = () => {
         const endDate = queryData.endDate as string;
         const my = queryData.my as string;
 
-        dispatch(orderActions.exportToExcel({
-            status: status,
-            group: group,
-            course: course,
-            courseFormat: courseFormat,
-            courseType: courseType,
-            name: name,
-            surname: surname,
-            email: email,
-            phone: phone,
-            age: age,
-            startDate: startDate,
-            endDate: endDate,
-            my: my
-        }));
+        const params: Record<string, string | undefined> = {
+            page, status, group, course, courseFormat, courseType, name, surname, email,
+            phone, age, startDate, endDate, my,};
 
+        if (orderBy) {
+            params.order = orderBy;
+        }
+
+        dispatch(orderActions.exportToExcel(params));
     }
 
-    return (
-        <div className={css.container}>
-            {isFilterVisible && <FilterComponent onFilter={handleFilterChange} onReset={handleResetChange}
-                                                 onFilterExcel={handleFilterExcel}/>}
-            <Order orders={orders} onEditOrder={handleEditOrder}/>
-            {loading && <Loader2/>}
-            <Pagination
-                pageCount={total_pages || 1}
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
-                isFirstPage={currentPage === 1}
-                isLastPage={currentPage === total_pages}
-            />
+        const downloadExcelFile = (url: string) => {
+            try {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Orders.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (error) {
+            }
+        };
 
-        </div>
-    );
-};
+        useEffect(() => {
+            if (excelUrl) {
+                downloadExcelFile(excelUrl);
+            }
+        }, [excelUrl]);
+
+
+        return (
+            <div className={css.container}>
+                {isFilterVisible && <FilterComponent onFilter={handleFilterChange} onReset={handleResetChange}
+                                                     onFilterExcel={handleFilterExcel}/>}
+                <Order orders={orders} onEditOrder={handleEditOrder}/>
+                {loading && <Loader2/>}
+                <Pagination
+                    pageCount={total_pages || 1}
+                    currentPage={currentPage}
+                    onPageChange={handlePageChange}
+                    isFirstPage={currentPage === 1}
+                    isLastPage={currentPage === total_pages}
+                />
+
+            </div>
+        );
+    }
+;
 
 export {Orders};
