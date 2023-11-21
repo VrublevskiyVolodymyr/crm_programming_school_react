@@ -9,7 +9,6 @@ import {IManager} from "../../interfaces";
 import css from "./managerFormModal.module.css";
 
 
-
 interface IProps {
 
 }
