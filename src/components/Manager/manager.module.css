@@ -1,0 +1,59 @@
+
+*{
+    box-sizing: border-box;
+}
+
+.container {
+    border: 1px solid #ccc;
+    min-width: 1100px;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+}
+
+.manager{
+    display: flex;
+    min-width: 1000px;
+    align-items: flex-start;
+    border: 2px solid green;
+    border-radius: 10px;
+    padding: 10px;
+    gap: 10px;
+}
+
+.managerInfo {
+padding-left: 20px ;
+}
+
+.managerInfo > div {
+    color: #333;
+}
+
+.managerStatistic {
+    padding: 0 100px;
+}
+
+.managerButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.managerButtons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    margin: 5px;
+    cursor: pointer;
+    background-color: #439f47;
+}
+
+
+.statistic_statuses{
+}
+
+.statistic_status{
+    font-size: 15px;
+}

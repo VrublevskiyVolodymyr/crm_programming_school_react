@@ -1,10 +1,8 @@
 import {createAsyncThunk, createSlice, isFulfilled, isRejectedWithValue} from '@reduxjs/toolkit';
 import {AxiosError} from 'axios';
 
-import {ITokenPair, IError, IUser, IErrorAuth} from '../../interfaces';
+import {ITokenPair, IUser, IErrorAuth} from '../../interfaces';
 import {authService} from '../../services';
-import {Simulate} from "react-dom/test-utils";
-import error = Simulate.error;
 
 
 

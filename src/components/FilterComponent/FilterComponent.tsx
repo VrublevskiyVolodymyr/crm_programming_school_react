@@ -321,6 +321,7 @@ return (
                                     styles={customStyles}
                                     maxMenuHeight={250}
                                     {...field}
+                                    isSearchable={false}
                                     value={statusOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                     onChange={(selectedOption) => {
                                         const selectedValue = selectedOption ? selectedOption.value : '';
@@ -409,6 +410,7 @@ return (
                                 menuPlacement="auto"
                                 options={groupOptions}
                                 {...field}
+                                isSearchable={false}
                                 value={groupOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                 onChange={(selectedOption) => {
                                     const selectedValue = selectedOption ? selectedOption.value : '';
@@ -432,6 +434,7 @@ return (
                                     styles={customStyles}
                                     maxMenuHeight={250}
                                     {...field}
+                                    isSearchable={false}
                                     value={courseOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                     onChange={(selectedOption) => {
                                         const selectedValue = selectedOption ? selectedOption.value : '';
@@ -477,6 +480,7 @@ return (
                                     styles={customStyles}
                                     maxMenuHeight={250}
                                     {...field}
+                                    isSearchable={false}
                                     value={courseFormatOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                     onChange={(selectedOption) => {
                                         const selectedValue = selectedOption ? selectedOption.value : '';
@@ -523,6 +527,7 @@ return (
                                     maxMenuHeight={250}
                                     menuPlacement="top"
                                     {...field}
+                                    isSearchable={false}
                                     value={courseTypeOptions.find((option) => option.value === (field.value !== undefined ? field.value : ''))}
                                     onChange={(selectedOption) => {
                                         const selectedValue = selectedOption ? selectedOption.value : '';

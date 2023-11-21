@@ -67,6 +67,7 @@ const Order: FC<IProps> = ({orders, onEditOrder}) => {
 
     const closeEditModal = () => {
         setOpenEditModalIndex({});
+        dispatch(orderActions.setIsUpdate(false))
     };
 
     const formatDate = (dateString: string) => {
@@ -114,7 +115,7 @@ const Order: FC<IProps> = ({orders, onEditOrder}) => {
                             <td>{order.sum || 'null'}</td>
                             <td>{order.alreadyPaid || 'null'}</td>
                             <td>{order.group ? (order.group.name || 'null') : 'null'}</td>
-                            <td>{order.created || 'null'}</td>
+                            <td>{formatDate(order.created )|| 'null'}</td>
                             <td>{order.manager ? (order.manager.name || 'null') : 'null'}</td>
                         </tr>
                         {expandedRows.includes(order.id) && (
@@ -146,7 +147,7 @@ const Order: FC<IProps> = ({orders, onEditOrder}) => {
                                             </div>}
 
                                             <div className={css.commentForm}>
-                                                <CommentForm orderId={order.id} managerId={order.manager ? order.manager.id : 0} manager={order.manager}/>
+                                                <CommentForm orderId={order.id} managerId={order.manager?.id ? order.manager.id : 0} manager={order.manager}/>
                                             </div>
 
                                             <button  disabled={!(me && me.id  && (order.manager===null || me.id === order.manager.id))} onClick={() => openEditModal(order,order.id) }>Edit</button>

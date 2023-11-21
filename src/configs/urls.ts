@@ -16,7 +16,11 @@ const urls = {
     },
     admin: {
         users:`${admin}/users`,
-        re_token: (id: number):string => `${admin}/users/${id}/re_token`
+        unban:(id:number):string =>`${admin}/users/${id}/unban`,
+        ban:(id:number):string =>`${admin}/users/${id}/ban`,
+        re_token: (id: number):string => `${admin}/users/${id}/re_token`,
+        statisticAll:`${admin}/statistic/orders`,
+        statisticByManagerId:(id:number): string => `${admin}/statistic/users/${id}`
     },
     groups: {
         groups: groups,
@@ -28,7 +32,6 @@ const urls = {
         excel: excel
     },
     me:`${users}/me`
-
 }
 
 export {baseURL, urls}

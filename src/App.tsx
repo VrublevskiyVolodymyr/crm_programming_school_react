@@ -2,7 +2,7 @@ import {FC} from 'react';
 import {Navigate, Route, Routes} from "react-router-dom";
 
 import {MainLayout} from "./layouts";
-import {LoginPage, OrderPage} from "./pages";
+import {AdminPanelPage, LoginPage, OrderPage} from "./pages";
 import {RequiredAuth} from "./hoс";
 import './App.css';
 
@@ -24,6 +24,11 @@ const App: FC<IProps> = () => {
                     <Route path={'orders'} element={
                         <RequiredAuth>
                             <OrderPage/>
+                        </RequiredAuth>
+                    }/>
+                    <Route path={'adminPanel'} element={
+                        <RequiredAuth>
+                            <AdminPanelPage/>
                         </RequiredAuth>
                     }/>
                 </Route>

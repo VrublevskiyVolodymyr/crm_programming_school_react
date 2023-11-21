@@ -1,7 +1,7 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, isFulfilled, isRejectedWithValue} from "@reduxjs/toolkit";
 import {AxiosError} from "axios";
 
-import {IComment, IGroup, IOrder, IOrderPainted, IOrderExcel} from "../../interfaces";
+import {IComment, IErrorAuth, IGroup, IOrder, IOrderPainted} from "../../interfaces";
 import {orderService} from "../../services";
 
     interface IState {
@@ -18,7 +18,9 @@ import {orderService} from "../../services";
         orderBy: string | null,
         shouldResetFilters: boolean,
         excelUrl: string | null;
-}
+        error: IErrorAuth | null ;
+        isUpdate:boolean;
+    }
 
 const initialState: IState = {
     orders: [],
@@ -33,7 +35,9 @@ const initialState: IState = {
     queryFromFilter: null,
     orderBy: null,
     shouldResetFilters: false,
-    excelUrl: null
+    excelUrl: null,
+    error: null,
+    isUpdate:false
 };
 
 
@@ -52,7 +56,7 @@ const getAll = createAsyncThunk<IOrderPainted, {
     group?: string,
     startDate?: string,
     endDate?: string,
-    my?: string
+    my?: string,
 }>(
     'orderSlice/getAll',
     async ({
@@ -191,6 +195,12 @@ const orderSlice = createSlice({
         setShouldResetFilters: (state, action) => {
             state.shouldResetFilters = action.payload;
         },
+        setError: (state, action) => {
+            state.error = action.payload;
+        },
+        setIsUpdate: (state, action) => {
+            state.isUpdate = action.payload;
+        },
     },
     extraReducers: (builder) =>
         builder
@@ -202,13 +212,11 @@ const orderSlice = createSlice({
                 state.total_pages = total_pages;
                 state.loading = false
             })
-            .addCase(exportToExcel.fulfilled, (state, action) => {
 
+            .addCase(exportToExcel.fulfilled, (state, action) => {
                 state.excelUrl = action.payload;
                 state.loading = false;
             })
-
-
 
             .addCase(createComment.fulfilled, (state, action) => {
                 const {orderId, manager} = action.payload;
@@ -223,7 +231,6 @@ const orderSlice = createSlice({
                         if (manager) {
                             updatedOrder.manager = manager
                         }
-
                         return updatedOrder;
                     } else {
                         return order;
@@ -233,6 +240,7 @@ const orderSlice = createSlice({
             .addCase(update.fulfilled, (state, action) => {
                 const {id, ...updatedOrder} = action.payload;
                 state.loading = false
+                state.isUpdate=true
                 state.orders = state.orders.map((order) => {
                     if (order.id === id) {
                         const updated = {...order, ...updatedOrder};
@@ -249,18 +257,30 @@ const orderSlice = createSlice({
             .addCase(createGroup.fulfilled, (state, action) => {
                 state.loading = false
                 state.groups = [...state.groups, action.payload];
+                state.loading = false
+            })
+            .addMatcher(isFulfilled(), state => {
+                state.error = null
+            })
+            .addMatcher(isRejectedWithValue(update, createGroup), (state, action) => {
+                if (typeof action.payload === 'string') {
+                    state.error = { error: action.payload, code: 400, details: null };
+                    state.loading = false
+                } else {
+                    state.error = action.payload as IErrorAuth;
+                    state.loading = false
+                }
             })
             .addDefaultCase((state, actions) => {
                 const [actionStatus] = actions.type.split('/').slice(-1);
                 state.loading = actionStatus === 'pending';
             })
-
 });
 
 
 const {
     reducer: orderReducer,
-    actions: {setSortedColumn, setFilterVisible, setQueryFromFilter, setOrderBy, setShouldResetFilters}
+    actions: {setSortedColumn, setFilterVisible, setQueryFromFilter, setOrderBy, setShouldResetFilters, setError,setIsUpdate}
 } = orderSlice;
 
 const orderActions = {
@@ -274,9 +294,9 @@ const orderActions = {
     setSortedColumn,
     setQueryFromFilter,
     setOrderBy,
-    setShouldResetFilters
-
-
+    setShouldResetFilters,
+    setError,
+    setIsUpdate
 }
 
 export {orderReducer, orderActions}

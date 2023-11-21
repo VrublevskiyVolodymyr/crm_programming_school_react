@@ -2,7 +2,6 @@ import {IComment, IGroup, IOrder, IOrderExcel, IOrderPainted} from "../interface
 import {urls} from "../configs";
 import {axiosService} from "./axios.service";
 import {IRes} from "../types";
-import {execFile} from "child_process";
 
 
 const orderService = {
