@@ -58,6 +58,10 @@ const authService: AuthService = {
     getRefreshToken: (): string | null => {
         return localStorage.getItem('refresh');
     },
+
+    activate: (token: string, password: string):IRes<string> => {
+        return axiosService.post(urls.auth.activate(token),{password:password})
+    }
 };
 
 export {authService};

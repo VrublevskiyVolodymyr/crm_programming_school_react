@@ -9,4 +9,5 @@ export type AuthService = {
     deleteTokens: () => void;
     setTokens: ({ access, refresh }: ITokens) => void;
     getRefreshToken: () => string | null;
+    activate: (token:string, password:string) => IRes<string>;
 };

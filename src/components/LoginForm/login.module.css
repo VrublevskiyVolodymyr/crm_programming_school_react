@@ -1,5 +1,5 @@
 .loginForm {
-    width: 300px;
+    width: 250px;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ccc;
@@ -22,7 +22,9 @@ input[type="password"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 3px;
+    border-radius: 10px;
+    background-color: #ededed;
+
 }
 
 .loginButton{

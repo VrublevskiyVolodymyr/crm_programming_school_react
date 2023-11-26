@@ -8,7 +8,6 @@ import {authService} from "../../services";
 import {authActions} from "../../redux/slices/auth.slice";
 import css from './header.module.css'
 import {orderActions} from "../../redux";
-import qs from "qs";
 
 interface IProps {
 }

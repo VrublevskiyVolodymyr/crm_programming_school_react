@@ -1,19 +1,21 @@
 import {createAsyncThunk, createSlice, isFulfilled, isRejectedWithValue} from '@reduxjs/toolkit';
 import {AxiosError} from 'axios';
 
-import {ITokenPair, IUser, IErrorAuth} from '../../interfaces';
-import {authService} from '../../services';
+import {ITokenPair, IUser, IErrorAuth, IManager} from '../../interfaces';
+import {adminService, authService} from '../../services';
 
 
 
 interface IState {
     error: IErrorAuth | null ;
     me: IUser | null;
+    activate: string | null;
 }
 
 const initialState: IState = {
     error: null,
-    me: null
+    me: null,
+    activate: null
 }
 
 const login = createAsyncThunk<IUser, ITokenPair>(
@@ -39,6 +41,20 @@ const me = createAsyncThunk<IUser, void>(
         return data
     }
 )
+
+const activateManager = createAsyncThunk<string, {token:string, password:string} >(
+    'authSlice/activateManager',
+    async ({token, password}, {rejectWithValue}) => {
+        try {
+            const {data} = await authService.activate(token, password)
+            return data
+        } catch (e) {
+            const err = e as AxiosError
+            return rejectWithValue(err.response?.data)
+        }
+    }
+)
+
 const slice = createSlice({
     name: 'authSlice',
     initialState,
@@ -55,6 +71,9 @@ const slice = createSlice({
             })
             .addCase(me.fulfilled, (state, action) => {
                 state.me = action.payload
+            })
+            .addCase(activateManager.fulfilled, (state, action) => {
+                state.activate = action.payload
             })
             .addMatcher(isFulfilled(), state => {
                 state.error = null
@@ -75,6 +94,7 @@ const authActions = {
     ...actions,
     login,
     me,
+    activateManager
 }
 
 export {

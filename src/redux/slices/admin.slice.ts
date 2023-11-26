@@ -132,6 +132,9 @@ const adminSlice = createSlice({
         setIsVisibleManagerModal: (state, action) => {
             state.isVisibleManagerModal = action.payload;
         },
+        setReToken: (state, action) => {
+            state.re_token = action.payload;
+        },
     },
     extraReducers: (builder) =>
         builder
@@ -198,7 +201,7 @@ const adminSlice = createSlice({
 
 const {
     reducer: adminReducer,
-    actions: {setIsVisibleManagerModal}
+    actions: {setIsVisibleManagerModal,setReToken}
 } = adminSlice;
 
 const adminActions = {
@@ -209,8 +212,8 @@ const adminActions = {
     unbanManager,
     getAllStatistic,
     getStatisticByManagerId,
-    setIsVisibleManagerModal
-
+    setIsVisibleManagerModal,
+    setReToken
 }
 
 export {adminReducer, adminActions}

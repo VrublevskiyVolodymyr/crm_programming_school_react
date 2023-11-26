@@ -46,17 +46,17 @@ const ManagerFormModal: FC<IProps> = () => {
                 <form onSubmit={handleSubmit(create)} className={css.form}>
                     <div className={css.formGroup}>
                         <label>Name</label>
-                        <input className={"form-control"} type="text" placeholder={'Name'} {...register('name', { required: true })} onChange={handleInputChange} />
+                        <input className={css.form_control} type="text" placeholder={'Name'} {...register('name', { required: true })} onChange={handleInputChange} />
                     </div>
 
                     <div className={css.formGroup}>
                         <label>Surname</label>
-                        <input className={"form-control"} type="text" placeholder={'Surname'} {...register('surname', { required: true })} onChange={handleInputChange} />
+                        <input className={css.form_control} type="text" placeholder={'Surname'} {...register('surname', { required: true })} onChange={handleInputChange} />
                     </div>
 
                     <div className={css.formGroup}>
                         <label>Email</label>
-                        <input className={"form-control"} type="text" placeholder={'Email'} {...register('email', { required: true })}  onChange={handleInputChange} />
+                        <input className={css.form_control} type="text" placeholder={'Email'} {...register('email', { required: true })}  onChange={handleInputChange} />
                     </div>
 
                     <div className={css.buttonContainer}>

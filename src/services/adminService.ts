@@ -21,6 +21,7 @@ const adminService = {
     statisticAll: (): IRes<IStatistic> => axiosService.get(urls.admin.statisticAll),
 
     statisticByManagerId: (id:number ) => axiosService.get(urls.admin.statisticByManagerId(id))
+
 }
 
 

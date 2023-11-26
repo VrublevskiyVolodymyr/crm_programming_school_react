@@ -1,4 +1,4 @@
-import {FC} from 'react';
+import {FC, useEffect, useState} from 'react';
 import {IUser} from "../../interfaces";
 
 import css from './manager.module.css'
@@ -10,40 +10,62 @@ interface IProps {
 }
 
 const Manager: FC<IProps> = ({manager}) => {
-        const {id, name, surname, email, is_active, lastLogin} = manager;
+    const {id, name, surname, email, is_active, lastLogin} = manager;
 
-        const {re_token} = useAppSelector(state => state.adminReducer)
-        const statistic = useAppSelector((state) => state.adminReducer.statistics[id]);
-        const dispatch = useAppDispatch();
+    const {re_token} = useAppSelector(state => state.adminReducer)
+    const statistic = useAppSelector((state) => state.adminReducer.statistics[id]);
+    const dispatch = useAppDispatch();
+    const [isCopied, setIsCopied] = useState(false);
+    const [copiedManager, setCopiedManager] = useState<number | null>(null);
 
-        const formatDate = (dateString: string) => {
-            const options: Intl.DateTimeFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', options);
-        }
 
-        const handleRecoveryPassword = (id: number) => {
-            dispatch(adminActions.getReToken({id}))
-        };
+    const url = `http://localhost:3000/activate/${re_token?.access}`;
 
-        const handleBan = (id: number) => {
-            dispatch(adminActions.banManager({id}));
-        };
+    const formatDate = (dateString: string) => {
+        const options: Intl.DateTimeFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', options);
+    }
 
-        const handleUnban = (id: number) => {
-            dispatch(adminActions.unbanManager({id}));
-        };
+    const handleRecoveryPassword = (id: number) => {
+        setCopiedManager(id);
+        dispatch(adminActions.getReToken({id}));
+    };
+
+    const handleBan = (id: number) => {
+        dispatch(adminActions.banManager({id}));
+    };
+
+    const handleUnban = (id: number) => {
+        dispatch(adminActions.unbanManager({id}));
+    };
+
+
+    const handleCopyToClipboard = (url: string, managerId: number) => {
+        navigator.clipboard.writeText(url)
+            .then(() => {
+                setIsCopied(true);
+                setCopiedManager(managerId);
+                dispatch(adminActions.setReToken(null));
+
+                setTimeout(() => {
+                    setIsCopied(false);
+                    setCopiedManager(null);
+                }, 1000);
+            });
+    };
+
 
     return (
         <div className={css.container}>
             <div className={css.manager}>
                 <div className={css.managerInfo}>
-                    <div> id: {manager? id : null} </div>
-                    <div> name: {manager? name : null} </div>
-                    <div> surname: {manager? name : null} </div>
-                    <div> email: {manager? email : null} </div>
+                    <div> id: {manager ? id : null} </div>
+                    <div> name: {manager ? name : null} </div>
+                    <div> surname: {manager ? name : null} </div>
+                    <div> email: {manager ? email : null} </div>
                     <div> is_active: {is_active ? 'true' : 'false'} </div>
-                    <div> lastLogin: {manager.lastLogin? formatDate(lastLogin.toString()) : null} </div>
+                    <div> lastLogin: {manager.lastLogin ? formatDate(lastLogin.toString()) : null} </div>
                 </div>
 
                 <div className={css.managerStatistic}>
@@ -55,12 +77,13 @@ const Manager: FC<IProps> = ({manager}) => {
                             </div>
 
                             {statistic.statuses.map((status, index) => {
-                                if(status.count!==0){
-                                return (
-                                    <div className={css.statistic_status} key={index}>
-                                        {status.status} : {status.count}
-                                    </div>
-                                );}
+                                if (status.count !== 0) {
+                                    return (
+                                        <div className={css.statistic_status} key={index}>
+                                            {status.status} : {status.count}
+                                        </div>
+                                    );
+                                }
                             })}
 
                         </div>
@@ -69,7 +92,13 @@ const Manager: FC<IProps> = ({manager}) => {
                 </div>
 
                 <div className={css.managerButtons}>
-                    <button onClick={() => handleRecoveryPassword(id)}>RECOVERY PASSWORD</button>
+                    <div>
+                        <button onClick={() => re_token ? handleCopyToClipboard(url, id) : handleRecoveryPassword(id)}>
+                            {copiedManager === id ? "COPY TO CLIPBOARD" : is_active ? "RECOVERY PASSWORD" : "ACTIVE"}
+                        </button>
+                        { copiedManager === id && isCopied && <div>Link copied to clipboard</div>}
+                    </div>
+
                     <button onClick={() => handleBan(id)}>BAN</button>
                     <button onClick={() => handleUnban(id)}>UNBAN</button>
                 </div>

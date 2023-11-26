@@ -5,6 +5,7 @@ import {MainLayout} from "./layouts";
 import {AdminPanelPage, LoginPage, OrderPage} from "./pages";
 import {RequiredAuth} from "./hoс";
 import './App.css';
+import {ActivatePage} from "./pages/ActivatePage/ActivatePage";
 
 
 interface IProps {
@@ -21,6 +22,7 @@ const App: FC<IProps> = () => {
                 <Route path={'/'} element={<MainLayout/>}>
                     <Route index element={<Navigate to={"orders"}/>}/>
                     <Route path={"login"} element={<LoginPage />}/>
+                    <Route path={"activate/:token"} element={<ActivatePage/>}/>
                     <Route path={'orders'} element={
                         <RequiredAuth>
                             <OrderPage/>
