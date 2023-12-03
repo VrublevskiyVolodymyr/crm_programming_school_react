@@ -62,7 +62,7 @@ const Manager: FC<IProps> = ({manager}) => {
                 <div className={css.managerInfo}>
                     <div> id: {manager ? id : null} </div>
                     <div> name: {manager ? name : null} </div>
-                    <div> surname: {manager ? name : null} </div>
+                    <div> surname: {manager ? surname : null} </div>
                     <div> email: {manager ? email : null} </div>
                     <div> is_active: {is_active ? 'true' : 'false'} </div>
                     <div> lastLogin: {manager.lastLogin ? formatDate(lastLogin.toString()) : null} </div>

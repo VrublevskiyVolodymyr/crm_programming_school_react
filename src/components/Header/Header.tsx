@@ -63,7 +63,10 @@ const Header: FC<IProps>  = () => {
                         <div>
                             <span>{me.name}</span>
 
-                            <button className={css.adminPanel} onClick={handleAdminPanel}> <FaUserCog/></button>
+                            { !hasAdminPanel &&
+                                ( <button className={css.adminPanel} onClick={handleAdminPanel}> <FaUserCog/></button>)
+                            }
+
                             { !hasAdminPanel &&
                                 ( <button onClick={toggleFilter} className={css.faFilter} >
                                 <FaFilter />

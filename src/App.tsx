@@ -6,6 +6,7 @@ import {AdminPanelPage, LoginPage, OrderPage} from "./pages";
 import {RequiredAuth} from "./hoс";
 import './App.css';
 import {ActivatePage} from "./pages/ActivatePage/ActivatePage";
+import {useAppSelector} from "./hooks";
 
 
 interface IProps {
@@ -14,6 +15,7 @@ interface IProps {
 
 const App: FC<IProps> = () => {
 
+const {me} = useAppSelector(state => state.authReducer);
 
     return (
         <div className="app_container">
@@ -30,7 +32,7 @@ const App: FC<IProps> = () => {
                     }/>
                     <Route path={'adminPanel'} element={
                         <RequiredAuth>
-                            <AdminPanelPage/>
+                            {me?.is_superuser ? <AdminPanelPage /> : <Navigate to={'/orders'} />}
                         </RequiredAuth>
                     }/>
                 </Route>
